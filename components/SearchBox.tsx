@@ -3,28 +3,40 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EXPRESSIONS } from "@/lib/expressions";
 
-// Tiny auto-sizing pill. No button: search fires when you stop typing
-// (debounced), or immediately on Enter / picking a suggestion.
+// Controlled pill: the page owns the value so the play-cycle can type into it.
+// Search fires when the user stops typing (debounced), or immediately on Enter /
+// picking a suggestion. While the play-cycle runs, suggestions + hint are muted.
 const MAX_SUGGESTIONS = 8;
 const DEBOUNCE_MS = 450;
 
 export default function SearchBox({
+  value,
+  onValueChange,
   onSearch,
+  playing,
 }: {
+  value: string;
+  onValueChange: (v: string) => void;
   onSearch: (q: string) => void;
+  playing: boolean;
 }) {
-  const [value, setValue] = useState("");
   const [open, setOpen] = useState(false);
   const [hi, setHi] = useState(-1);
-  const [hint, setHint] = useState(true); // brief "what to type" tooltip
+  const [hint, setHint] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Show the hint for a few seconds on load.
   useEffect(() => {
     const t = setTimeout(() => setHint(false), 4000);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   const suggestions = useMemo(() => {
     const q = value.trim().toLowerCase();
@@ -40,13 +52,6 @@ export default function SearchBox({
     return [...starts, ...contains].slice(0, MAX_SUGGESTIONS);
   }, [value]);
 
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-
   function fireNow(q: string) {
     if (timer.current) clearTimeout(timer.current);
     timer.current = null;
@@ -58,7 +63,7 @@ export default function SearchBox({
   }
 
   function choose(s: string) {
-    setValue(s);
+    onValueChange(s);
     setOpen(false);
     setHi(-1);
     fireNow(s);
@@ -86,18 +91,19 @@ export default function SearchBox({
     }
   }
 
-  // Grow with the text, but stay small enough to "fit a short word".
   const widthCh = Math.max(6, value.length + 1);
+  const showHint = !value && !playing;
+  const showSuggestions = open && !playing && suggestions.length > 0;
 
   return (
     <div className="search-field">
-      {!value && (
+      {showHint && (
         <div className={`search-hint ${hint ? "" : "hide"}`}>
           Enter an expression or emotion
         </div>
       )}
 
-      {open && suggestions.length > 0 && (
+      {showSuggestions && (
         <ul className="suggestions">
           {suggestions.map((s, i) => (
             <li
@@ -121,12 +127,12 @@ export default function SearchBox({
           value={value}
           style={{ width: `${widthCh}ch` }}
           onChange={(e) => {
-            setValue(e.target.value);
+            onValueChange(e.target.value);
             setOpen(true);
             setHi(-1);
             fireDebounced(e.target.value);
           }}
-          onFocus={() => value && setOpen(true)}
+          onFocus={() => value && !playing && setOpen(true)}
           onBlur={() => setOpen(false)}
           onKeyDown={onKey}
           autoFocus
@@ -137,7 +143,7 @@ export default function SearchBox({
             className="pill-clear"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => {
-              setValue("");
+              onValueChange("");
               setOpen(false);
               setHi(-1);
               fireNow("");

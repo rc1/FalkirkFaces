@@ -27,6 +27,27 @@ const curated = [
   "lost for words", "at a loss", "seen a ghost", "weight of the world",
   "carrying a secret", "letting go", "breaking down", "pulling it together",
   "soft focus", "hard edge", "guard up", "guard down",
+  // More nuanced, observational — the in-between feelings.
+  "barely holding back a smile", "trying to stay composed", "fighting back tears",
+  "swallowing a lump in the throat", "blinking back emotion", "caught mid-thought",
+  "drifting off", "somewhere else entirely", "quietly seething", "simmering beneath",
+  "holding it in", "about to lose it", "stifling a yawn", "suppressing a laugh",
+  "unimpressed", "underwhelmed", "mildly bemused", "politely baffled",
+  "gently amused", "softly delighted", "quietly proud", "secretly pleased",
+  "openly adoring", "tender and watchful", "wistful and far away",
+  "weary but warm", "tired but tender", "hardened but hurting",
+  "bracing against the cold", "squinting into low sun", "wind in the face",
+  "mouth open mid-shout", "roaring with the crowd", "lost in a chant",
+  "rapt and unblinking", "leaning in to listen", "straining to see",
+  "craning for a better look", "shielding the eyes", "hand over mouth",
+  "fingers to the lips", "cheeks flushed", "eyes glistening", "jaw set hard",
+  "lip curled", "nose wrinkled", "brow knotted", "eyes narrowed to slits",
+  "a slow dawning smile", "the moment before laughter", "the moment after tears",
+  "quiet awe", "reverent stillness", "private grief in a crowd",
+  "alone in a sea of people", "unguarded for a second", "mask slipping",
+  "putting on a brave face", "world-weary", "young and unguarded",
+  "old and knowing", "deadpan to the core", "wry and knowing",
+  "half a smirk", "almost a frown", "not quite crying", "not quite smiling",
 ];
 
 // Single-word emotions.
@@ -49,6 +70,14 @@ const emotions = [
   "gratitude", "relief", "satisfaction", "triumph", "resignation", "helplessness",
   "confusion", "bewilderment", "disbelief", "skepticism", "doubt", "concentration",
   "focus", "wonderment", "heartbreak", "numbness", "restlessness", "menace",
+  // Finer-grained shades.
+  "tenderness", "yearning", "reverence", "trepidation", "foreboding",
+  "consternation", "incredulity", "bemusement", "wariness", "tenacity",
+  "stoicism", "fortitude", "vulnerability", "tendresse", "rapture",
+  "disquiet", "ennui", "sullenness", "petulance", "indignation",
+  "vexation", "wistfulness", "serenity", "tranquility", "elatedness",
+  "jubilation", "rapt wonder", "tender pity", "bittersweetness", "longing",
+  "homesickness", "nostalgia", "reluctance", "hesitancy", "ambivalence",
 ];
 
 // Single-word expressions.
@@ -88,7 +117,7 @@ expressions.forEach(add);
 for (const m of exprMods) for (const e of expressions) add(`${m} ${e}`);
 for (const m of emoMods) for (const e of emotions) add(`${m} ${e}`);
 
-const LIMIT = 500;
+const LIMIT = 800;
 const list = out.slice(0, LIMIT);
 
 const file = path.resolve("lib/expressions.ts");
