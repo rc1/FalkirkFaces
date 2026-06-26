@@ -1,0 +1,40 @@
+# Two services:
+#   web    — the Next.js app + TS pipeline (scan / crop / embed / rebuild)
+#   detect — one-shot Python face detection (InsightFace), run on demand
+#
+# All generated data lives under ./volumes. Source images under ./photos.
+#
+#   docker compose up web                       # run the app on :3000
+#   docker compose run --rm detect              # detect faces -> volumes/detections.json
+#   docker compose run --rm web npm run rebuild # crop + embed + index
+#
+# (Locally without Docker you can just use npm scripts — see README.)
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      SOURCE_DIR: /app/photos
+      DATA_DIR: /app/volumes
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - /app/node_modules # keep the container's native modules
+      - ./photos:/app/photos
+      - ./volumes:/app/volumes
+
+  detect:
+    build:
+      context: .
+      dockerfile: python/Dockerfile
+    profiles: ["tools"] # don't start on `compose up`; run on demand
+    environment:
+      SOURCE_DIR: /app/photos
+      DATA_DIR: /app/volumes
+    volumes:
+      - ./photos:/app/photos:ro
+      - ./volumes:/app/volumes

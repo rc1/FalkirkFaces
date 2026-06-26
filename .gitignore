@@ -1,0 +1,26 @@
+node_modules
+.next
+.venv
+.DS_Store
+.env
+.env.local
+
+# Local agent/editor cruft.
+.claude
+
+# Generated, rebuildable artifacts — safe to wipe.
+volumes/crops
+volumes/thumbs
+volumes/full-thumbs
+volumes/lancedb
+volumes/manifest.json
+volumes/detections.json
+volumes/images.json
+volumes/insightface-cache
+
+# The PDF + extracted source photos are inputs, not committed here.
+*.pdf
+photos
+
+# Build info
+*.tsbuildinfo

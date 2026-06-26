@@ -1,0 +1,232 @@
+:root {
+  --bg: #08080a;
+  --text: #ece9e4;
+  --muted: #9a968e;
+  --accent: #d8c3a5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Full-bleed square mosaic ---------------------------------------- */
+.screen {
+  position: fixed;
+  inset: 0;
+}
+
+.mosaic {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+}
+
+.cell {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: #111114;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+.cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cell.empty {
+  background: #0c0c0e;
+  cursor: default;
+}
+
+/* Results bloom out from the centre — delay is set inline per cell. */
+.cell.bloom {
+  animation: bloom 420ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.78);
+    filter: brightness(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* Subtle hover — brightness only, no border. */
+.cell:not(.empty):hover img {
+  filter: brightness(1.12);
+}
+
+/* ---- Floating search dock -------------------------------------------- */
+.search-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+}
+
+.search-field {
+  position: relative;
+  width: auto;
+}
+
+/* Transient hint that floats above the input on load, then fades. */
+.search-hint {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--text);
+  background: rgba(18, 18, 22, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 7px 13px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+.search-hint.hide {
+  opacity: 0;
+}
+.search-hint::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(18, 18, 22, 0.82);
+}
+
+.dock-status {
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+}
+
+.search-pill {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  background: rgba(18, 18, 22, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 3px 7px 3px 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  transition: border-color 0.15s;
+}
+.search-pill:focus-within {
+  border-color: var(--accent);
+}
+.search-pill input {
+  flex: none;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--text);
+  font-size: 15.5px;
+  padding: 9px 4px;
+}
+.pill-clear {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin-right: 2px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+.pill-clear:hover {
+  color: var(--text);
+}
+
+/* ---- Autocomplete suggestions (open upward) -------------------------- */
+.suggestions {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  width: max-content;
+  min-width: 160px;
+  max-width: 70vw;
+  max-height: 42vh;
+  overflow-y: auto;
+  background: rgba(18, 18, 22, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.6);
+}
+.suggestion {
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.suggestion.active {
+  background: var(--accent);
+  color: #1a1712;
+}
+
+/* ---- Seamless zoom-to-full-image ------------------------------------- */
+.reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  cursor: zoom-out;
+  transition: background 0.6s ease;
+}
+.reveal-img {
+  position: fixed;
+  transform-origin: 0 0;
+  display: block;
+  will-change: transform;
+}

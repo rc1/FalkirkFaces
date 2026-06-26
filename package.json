@@ -1,0 +1,32 @@
+{
+  "name": "art-face-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0",
+    "build": "next build",
+    "start": "next start",
+    "scan": "tsx --env-file-if-exists=.env scripts/scan-images.ts",
+    "detect": "python3 python/detect_faces.py",
+    "crop": "tsx --env-file-if-exists=.env scripts/crop-faces.ts",
+    "embed": "tsx --env-file-if-exists=.env scripts/embed-faces.ts",
+    "rebuild": "tsx --env-file-if-exists=.env scripts/rebuild-index.ts",
+    "gen-expressions": "tsx scripts/gen-expressions.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^1.9.0",
+    "@lancedb/lancedb": "^0.21.0",
+    "next": "^15.3.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

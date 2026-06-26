@@ -1,0 +1,40 @@
+# Production deploy — behind the existing Traefik v2 on the external `web`
+# network (matches the other electricglen.com apps). Gated by HTTP basic auth.
+#
+#   falkirkface.electricglen.com  ->  user: falkirk  pass: cellardyke
+#
+# Source images + generated index are bind-mounted from this directory, so rsync
+# ./photos and ./volumes here (and a .env holding GEMINI_API_KEY) before bringing
+# it up:  docker compose -f docker-compose.prod.yml up -d --build
+name: falkirkface
+services:
+  falkirkface:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: falkirkface:local
+    container_name: falkirkface
+    restart: always
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - SOURCE_DIR=/app/photos
+      - DATA_DIR=/app/volumes
+    volumes:
+      - ./photos:/app/photos:ro
+      - ./volumes:/app/volumes
+    networks:
+      - web
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.falkirkface.rule=Host(`falkirkface.electricglen.com`)
+      - traefik.http.routers.falkirkface.entrypoints=websecure
+      - traefik.http.routers.falkirkface.tls=true
+      - traefik.http.routers.falkirkface.tls.certresolver=lets-encrypt
+      - traefik.http.routers.falkirkface.middlewares=falkirkface-auth
+      - traefik.http.middlewares.falkirkface-auth.basicauth.users=falkirk:$$2y$$05$$LJ88hPMXHIzDtsgMtaA6KuclpRtgjuip/epYuHGHf5fnt.GOkH.9S
+      - traefik.http.services.falkirkface.loadbalancer.server.port=8080
+
+networks:
+  web:
+    external: true
