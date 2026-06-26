@@ -257,6 +257,21 @@ body {
   color: #1a1712;
 }
 
+/* Center vignette — edge tiles fade toward the background to pull focus in.
+   Sits above the mosaic but below the dock/overlays; never intercepts clicks. */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 85% at 50% 44%,
+    transparent 30%,
+    rgba(8, 8, 10, 0.92) 100%
+  );
+  transition: opacity 0.3s ease;
+}
+
 /* ---- Hidden debug tweak panel ---------------------------------------- */
 .debug-hotspot {
   position: fixed;

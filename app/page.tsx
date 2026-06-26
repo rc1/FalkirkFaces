@@ -137,6 +137,9 @@ export default function Home() {
         faceZoom={dbg.faceZoom}
       />
 
+      {/* subtle center vignette — edges fade to draw the eye inward */}
+      <div className="vignette" style={{ opacity: dbg.vignette }} />
+
       {/* invisible hotspot to summon the debug panel on touch devices */}
       <div className="debug-hotspot" onClick={cornerTap} />
 

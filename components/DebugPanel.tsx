@@ -7,6 +7,7 @@
 export interface Dbg {
   tile: number; // 0 = responsive
   faceZoom: number; // CSS scale of the face inside its tile
+  vignette: number; // 0 = off, 1 = strong edge fade
   zoomMs: number;
   fadeDelay: number;
   dismissSpan: number;
@@ -17,6 +18,7 @@ export interface Dbg {
 export const DEFAULT_DBG: Dbg = {
   tile: 0,
   faceZoom: 1,
+  vignette: 0.42,
   zoomMs: 700,
   fadeDelay: 380,
   dismissSpan: 360,
@@ -93,6 +95,7 @@ export default function DebugPanel({
       )}
 
       <Row label="face zoom" value={dbg.faceZoom} min={0.8} max={2} step={0.02} onChange={set("faceZoom")} fmt={(v) => v.toFixed(2) + "×"} />
+      <Row label="vignette" value={dbg.vignette} min={0} max={1} step={0.05} onChange={set("vignette")} fmt={(v) => v.toFixed(2)} />
       <Row label="zoom ms" value={dbg.zoomMs} min={200} max={1500} step={20} onChange={set("zoomMs")} />
       <Row label="fade delay" value={dbg.fadeDelay} min={0} max={900} step={20} onChange={set("fadeDelay")} />
       <Row label="dismiss wave" value={dbg.dismissSpan} min={0} max={900} step={20} onChange={set("dismissSpan")} />
