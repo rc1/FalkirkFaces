@@ -21,6 +21,9 @@ export default function Home() {
     index: number;
     rect: DOMRect;
   } | null>(null);
+  // Which tile the grid is dismissed around. Cleared at the START of a close so
+  // the grid fades back in while the image is still fading/shrinking away.
+  const [dismiss, setDismiss] = useState<number | null>(null);
 
   const load = useCallback(async (q: string) => {
     if (!q.trim()) {
@@ -94,8 +97,9 @@ export default function Home() {
         onReveal={(face, index, rect) => {
           setPlaying(false); // clicking a face stops the play-cycle
           setRevealed({ face, index, rect });
+          setDismiss(index);
         }}
-        dismissIndex={revealed?.index ?? null}
+        dismissIndex={dismiss}
         radial={radial}
         gen={gen}
       />
@@ -148,6 +152,7 @@ export default function Home() {
         <Reveal
           face={revealed.face}
           rect={revealed.rect}
+          onClosingStart={() => setDismiss(null)}
           onClose={() => setRevealed(null)}
         />
       )}

@@ -4,27 +4,28 @@ import { useEffect, useMemo, useState } from "react";
 import type { FaceView } from "@/lib/types";
 
 // Seamless zoom: the clicked face (already framed inside its tile) expands until
-// the whole source image fits the screen. We position the full image so that,
-// at the start, its face region exactly overlays the tile — then animate the
-// transform to identity. No bounding box, no crop swap: one continuous zoom.
+// the whole source image fits the screen. The full image is positioned so its
+// face region overlays the tile at the start, then the transform animates to
+// identity. The image also fades in as it grows and fades out as it returns, so
+// the hand-off with the grid is a soft cross-fade rather than a snap.
 
-const FADE_DELAY = 420; // let the grid finish clearing before we expand
+const FADE_DELAY = 380; // let the grid clear a little before we expand
 const ZOOM_MS = 700;
 
 export default function Reveal({
   face,
   rect,
+  onClosingStart,
   onClose,
 }: {
   face: FaceView;
   rect: DOMRect;
-  onClose: () => void;
+  onClosingStart: () => void; // tell the grid to start coming back
+  onClose: () => void; // unmount once the return animation finishes
 }) {
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
 
-  // Geometry: final fit-to-screen rect, and the initial transform that maps the
-  // image's face region onto the clicked tile.
   const geo = useMemo(() => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -37,22 +38,16 @@ export default function Reveal({
     const finalTop = (vh - dispH) / 2;
 
     const b = face.bbox;
-    const S = rect.width / (b.width * scale); // zoom so the face fills the tile
+    const S = rect.width / (b.width * scale);
     const TX = rect.left - finalLeft - S * (b.x * scale);
     const TY = rect.top - finalTop - S * (b.y * scale);
 
     return {
-      style: {
-        left: finalLeft,
-        top: finalTop,
-        width: dispW,
-        height: dispH,
-      } as React.CSSProperties,
+      style: { left: finalLeft, top: finalTop, width: dispW, height: dispH } as React.CSSProperties,
       initial: `translate(${TX}px, ${TY}px) scale(${S})`,
     };
   }, [face, rect]);
 
-  // Kick off the expansion once the fade-out wave has had time to clear.
   useEffect(() => {
     const t = setTimeout(() => setOpen(true), FADE_DELAY);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
@@ -65,8 +60,10 @@ export default function Reveal({
   }, []);
 
   function close() {
+    if (closing) return;
     setClosing(true);
     setOpen(false);
+    onClosingStart(); // grid fades back in while the image fades out + shrinks
     setTimeout(onClose, ZOOM_MS);
   }
 
@@ -82,11 +79,12 @@ export default function Reveal({
       <img
         className="reveal-img"
         src={face.fullUrl}
-        alt={face.sourceImageFilename}
+        alt=""
         style={{
           ...geo.style,
           transform: expanded ? "none" : geo.initial,
-          transition: `transform ${ZOOM_MS}ms cubic-bezier(0.22,0.61,0.36,1)`,
+          opacity: expanded ? 1 : 0,
+          transition: `transform ${ZOOM_MS}ms cubic-bezier(0.22,0.61,0.36,1), opacity ${Math.round(ZOOM_MS * 0.7)}ms ease`,
         }}
       />
     </div>
