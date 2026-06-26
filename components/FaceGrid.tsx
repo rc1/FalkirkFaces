@@ -8,7 +8,9 @@ import type { FaceView } from "@/lib/types";
 // clicked the page sets `dismissIndex`; the other tiles fade out in a wave that
 // starts from the furthest cell and rolls inward toward the clicked one.
 
-const TARGET = 132; // desired tile edge in px; column count derives from this
+// Desired tile edge in px → column count derives from it. Smaller (denser) on
+// phones, roomier on desktop.
+const tileTarget = (w: number) => (w < 600 ? 72 : w < 960 ? 104 : 132);
 const DISMISS_SPAN = 360; // ms spread of the fade-out wave
 
 export default function FaceGrid({
@@ -40,7 +42,7 @@ export default function FaceGrid({
   const layout = useMemo(() => {
     const { w, h } = size;
     if (!w || !h) return null;
-    const cols = Math.max(1, Math.round(w / TARGET));
+    const cols = Math.max(1, Math.round(w / tileTarget(w)));
     const cell = w / cols;
     const rows = Math.max(1, Math.ceil(h / cell));
     const total = cols * rows;

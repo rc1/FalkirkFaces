@@ -91,20 +91,16 @@ export default function Home() {
     <main className="screen">
       <FaceGrid
         faces={faces}
-        onReveal={(face, index, rect) => setRevealed({ face, index, rect })}
+        onReveal={(face, index, rect) => {
+          setPlaying(false); // clicking a face stops the play-cycle
+          setRevealed({ face, index, rect });
+        }}
         dismissIndex={revealed?.index ?? null}
         radial={radial}
         gen={gen}
       />
 
       <div className="search-dock">
-        <SearchBox
-          value={query}
-          onValueChange={onUserChange}
-          onSearch={load}
-          playing={playing}
-        />
-
         <button
           className="dock-btn"
           onClick={toggleFullscreen}
@@ -121,6 +117,13 @@ export default function Home() {
             </svg>
           )}
         </button>
+
+        <SearchBox
+          value={query}
+          onValueChange={onUserChange}
+          onSearch={load}
+          playing={playing}
+        />
 
         <button
           className={`dock-btn ${playing ? "on" : ""}`}

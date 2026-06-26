@@ -1,7 +1,7 @@
 # Production deploy — behind the existing Traefik v2 on the external `web`
 # network (matches the other electricglen.com apps). Gated by HTTP basic auth.
 #
-#   falkirkface.electricglen.com  ->  user: falkirk  pass: cellardyke
+#   falkirkfaces.electricglen.com  ->  user: cellardyke  pass: cellardyke
 #
 # Source images + generated index are bind-mounted from this directory, so rsync
 # ./photos and ./volumes here (and a .env holding GEMINI_API_KEY) before bringing
@@ -27,12 +27,12 @@ services:
       - web
     labels:
       - traefik.enable=true
-      - traefik.http.routers.falkirkface.rule=Host(`falkirkface.electricglen.com`)
+      - traefik.http.routers.falkirkface.rule=Host(`falkirkfaces.electricglen.com`)
       - traefik.http.routers.falkirkface.entrypoints=websecure
       - traefik.http.routers.falkirkface.tls=true
       - traefik.http.routers.falkirkface.tls.certresolver=lets-encrypt
       - traefik.http.routers.falkirkface.middlewares=falkirkface-auth
-      - traefik.http.middlewares.falkirkface-auth.basicauth.users=falkirk:$$2y$$05$$LJ88hPMXHIzDtsgMtaA6KuclpRtgjuip/epYuHGHf5fnt.GOkH.9S
+      - traefik.http.middlewares.falkirkface-auth.basicauth.users=cellardyke:$$2y$$05$$LsKzOAqQFKnpTMjB08.H7.ZKilT0DGjP40.3SvxhIwhJAr.qKQiAi
       - traefik.http.services.falkirkface.loadbalancer.server.port=8080
 
 networks:

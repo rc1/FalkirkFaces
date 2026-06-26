@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { EXPRESSIONS } from "@/lib/expressions";
 
 // Controlled pill: the page owns the value so the play-cycle can type into it.
@@ -24,7 +24,15 @@ export default function SearchBox({
   const [hi, setHi] = useState(-1);
   const [hint, setHint] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
+  const sizerRef = useRef<HTMLSpanElement>(null);
+  const [inputW, setInputW] = useState(48);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Size the input to its text exactly (the `ch` unit over-pads), so the clear
+  // button sits right after the word.
+  useLayoutEffect(() => {
+    if (sizerRef.current) setInputW(Math.max(40, sizerRef.current.offsetWidth + 4));
+  }, [value]);
 
   useEffect(() => {
     const t = setTimeout(() => setHint(false), 4000);
@@ -91,7 +99,6 @@ export default function SearchBox({
     }
   }
 
-  const widthCh = Math.max(6, value.length + 1);
   const showHint = !value && !playing;
   const showSuggestions = open && !playing && suggestions.length > 0;
 
@@ -121,11 +128,15 @@ export default function SearchBox({
         </ul>
       )}
 
+      <span ref={sizerRef} className="input-sizer" aria-hidden>
+        {value}
+      </span>
+
       <div className="search-pill">
         <input
           ref={inputRef}
           value={value}
-          style={{ width: `${widthCh}ch` }}
+          style={{ width: `${inputW}px` }}
           onChange={(e) => {
             onValueChange(e.target.value);
             setOpen(true);
