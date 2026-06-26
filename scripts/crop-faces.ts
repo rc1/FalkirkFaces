@@ -3,11 +3,11 @@ import path from "node:path";
 import { paths } from "../lib/paths";
 import { config } from "../lib/config";
 import {
-  clampBox,
   cropFace,
   faceId,
   makeThumb,
   sourceId,
+  squareBox,
 } from "../lib/images";
 import { writeManifest } from "../lib/manifest";
 import type { ExcludeReason, Face } from "../lib/types";
@@ -103,7 +103,10 @@ async function main() {
       };
 
       if (!reason) {
-        const box = clampBox(rawBox, img.width, img.height);
+        // Crop a padded region (id stays keyed to the tight detection box, so
+        // existing embeddings still match). Store the padded box as the bbox so
+        // the click-to-zoom stays seamless with what the tile shows.
+        const box = squareBox(rawBox, config.cropMargin, img.width, img.height);
         const cropRel = path.join("crops", `${id}.jpg`);
         const thumbRel = path.join("thumbs", `${id}.jpg`);
         try {
@@ -117,6 +120,7 @@ async function main() {
             path.join(paths.data, thumbRel),
             config.thumbSize,
           );
+          face.bbox = box;
           face.cropPath = cropRel;
           face.thumbPath = thumbRel;
           face.cropWidth = width;

@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FaceView } from "@/lib/types";
 import SearchBox from "@/components/SearchBox";
 import FaceGrid from "@/components/FaceGrid";
 import Reveal from "@/components/Reveal";
+import DebugPanel, { DEFAULT_DBG, type Dbg } from "@/components/DebugPanel";
 import { PLAYLIST } from "@/lib/playlist";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -16,6 +17,10 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [playing, setPlaying] = useState(false);
   const [fs, setFs] = useState(false);
+  const [dbg, setDbg] = useState<Dbg>(DEFAULT_DBG);
+  const [dbgOpen, setDbgOpen] = useState(false);
+  const dbgRef = useRef(dbg);
+  dbgRef.current = dbg; // play loop reads this without re-subscribing
   const [revealed, setRevealed] = useState<{
     face: FaceView;
     index: number;
@@ -63,7 +68,7 @@ export default function Home() {
         }
         if (cancelled) return;
         await load(phrase);
-        await sleep(4000);
+        await sleep(dbgRef.current.playHold);
         idx++;
       }
     })();
@@ -78,6 +83,30 @@ export default function Home() {
     document.addEventListener("fullscreenchange", h);
     return () => document.removeEventListener("fullscreenchange", h);
   }, []);
+
+  // Hidden debug trigger: backtick key, or ?debug in the URL.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).has("debug")) {
+      setDbgOpen(true);
+    }
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (e.key === "`" && tag !== "INPUT") setDbgOpen((o) => !o);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Mobile-friendly trigger: 4 quick taps in the top-left corner.
+  const taps = useRef<number[]>([]);
+  const cornerTap = () => {
+    const now = Date.now();
+    taps.current = [...taps.current, now].filter((t) => now - t < 800);
+    if (taps.current.length >= 4) {
+      taps.current = [];
+      setDbgOpen((o) => !o);
+    }
+  };
 
   function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
@@ -102,7 +131,14 @@ export default function Home() {
         dismissIndex={dismiss}
         radial={radial}
         gen={gen}
+        tileOverride={dbg.tile}
+        dismissSpan={dbg.dismissSpan}
+        bloomStep={dbg.bloomStep}
+        faceZoom={dbg.faceZoom}
       />
+
+      {/* invisible hotspot to summon the debug panel on touch devices */}
+      <div className="debug-hotspot" onClick={cornerTap} />
 
       <div className="search-dock">
         <button
@@ -154,7 +190,13 @@ export default function Home() {
           rect={revealed.rect}
           onClosingStart={() => setDismiss(null)}
           onClose={() => setRevealed(null)}
+          fadeDelay={dbg.fadeDelay}
+          zoomMs={dbg.zoomMs}
         />
+      )}
+
+      {dbgOpen && (
+        <DebugPanel dbg={dbg} setDbg={setDbg} onClose={() => setDbgOpen(false)} />
       )}
     </main>
   );

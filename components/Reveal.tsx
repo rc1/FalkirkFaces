@@ -9,19 +9,20 @@ import type { FaceView } from "@/lib/types";
 // identity. The image also fades in as it grows and fades out as it returns, so
 // the hand-off with the grid is a soft cross-fade rather than a snap.
 
-const FADE_DELAY = 380; // let the grid clear a little before we expand
-const ZOOM_MS = 700;
-
 export default function Reveal({
   face,
   rect,
   onClosingStart,
   onClose,
+  fadeDelay = 380, // let the grid clear a little before we expand
+  zoomMs = 700,
 }: {
   face: FaceView;
   rect: DOMRect;
   onClosingStart: () => void; // tell the grid to start coming back
   onClose: () => void; // unmount once the return animation finishes
+  fadeDelay?: number;
+  zoomMs?: number;
 }) {
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -49,7 +50,7 @@ export default function Reveal({
   }, [face, rect]);
 
   useEffect(() => {
-    const t = setTimeout(() => setOpen(true), FADE_DELAY);
+    const t = setTimeout(() => setOpen(true), fadeDelay);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     window.addEventListener("keydown", onKey);
     return () => {
@@ -64,7 +65,7 @@ export default function Reveal({
     setClosing(true);
     setOpen(false);
     onClosingStart(); // grid fades back in while the image fades out + shrinks
-    setTimeout(onClose, ZOOM_MS);
+    setTimeout(onClose, zoomMs);
   }
 
   const expanded = open && !closing;
@@ -84,7 +85,7 @@ export default function Reveal({
           ...geo.style,
           transform: expanded ? "none" : geo.initial,
           opacity: expanded ? 1 : 0,
-          transition: `transform ${ZOOM_MS}ms cubic-bezier(0.22,0.61,0.36,1), opacity ${Math.round(ZOOM_MS * 0.7)}ms ease`,
+          transition: `transform ${zoomMs}ms cubic-bezier(0.22,0.61,0.36,1), opacity ${Math.round(zoomMs * 0.7)}ms ease`,
         }}
       />
     </div>

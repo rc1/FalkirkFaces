@@ -257,6 +257,88 @@ body {
   color: #1a1712;
 }
 
+/* ---- Hidden debug tweak panel ---------------------------------------- */
+.debug-hotspot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 56px;
+  height: 56px;
+  z-index: 40;
+  /* invisible; only there to catch the 4-tap gesture */
+}
+.debug-panel {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  width: 250px;
+  padding: 12px 14px;
+  background: rgba(16, 16, 20, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6);
+  color: var(--text);
+  font-size: 12px;
+}
+.debug-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.debug-head button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+}
+.debug-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 40px;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 0;
+}
+.debug-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.debug-label {
+  color: var(--muted);
+}
+.debug-val {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.debug-check {
+  grid-template-columns: auto 1fr;
+}
+.debug-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.debug-actions button {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.debug-actions button:hover {
+  border-color: var(--accent);
+}
+
 /* ---- Seamless zoom-to-full-image ------------------------------------- */
 .reveal {
   position: fixed;

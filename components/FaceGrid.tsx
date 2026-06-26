@@ -11,7 +11,6 @@ import type { FaceView } from "@/lib/types";
 // Desired tile edge in px → column count derives from it. Smaller (denser) on
 // phones, roomier on desktop.
 const tileTarget = (w: number) => (w < 600 ? 72 : w < 960 ? 104 : 132);
-const DISMISS_SPAN = 360; // ms spread of the fade-out wave
 
 export default function FaceGrid({
   faces,
@@ -19,12 +18,20 @@ export default function FaceGrid({
   dismissIndex,
   radial,
   gen,
+  tileOverride = 0,
+  dismissSpan = 360,
+  bloomStep = 7,
+  faceZoom = 1,
 }: {
   faces: FaceView[];
   onReveal: (face: FaceView, index: number, rect: DOMRect) => void;
   dismissIndex: number | null;
   radial: boolean;
   gen: number;
+  tileOverride?: number; // 0 = responsive
+  dismissSpan?: number; // ms spread of the fade-out wave
+  bloomStep?: number; // ms delay per tile in the radial bloom
+  faceZoom?: number; // CSS scale of the face within its tile
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -42,7 +49,8 @@ export default function FaceGrid({
   const layout = useMemo(() => {
     const { w, h } = size;
     if (!w || !h) return null;
-    const cols = Math.max(1, Math.round(w / tileTarget(w)));
+    const target = tileOverride > 0 ? tileOverride : tileTarget(w);
+    const cols = Math.max(1, Math.round(w / target));
     const cell = w / cols;
     const rows = Math.max(1, Math.ceil(h / cell));
     const total = cols * rows;
@@ -62,7 +70,7 @@ export default function FaceGrid({
     order.forEach((c, rank) => (placement[c.i] = { faceIdx: rank, rank }));
 
     return { cols, rows, cell, total, placement };
-  }, [size, radial]);
+  }, [size, radial, tileOverride]);
 
   // Distance from the clicked cell to the grid's furthest corner — used to
   // normalise the fade-out wave so the furthest tile leaves first.
@@ -107,7 +115,7 @@ export default function FaceGrid({
           );
           dismissStyle = {
             opacity: 0,
-            transitionDelay: `${(1 - dist / maxDist) * DISMISS_SPAN}ms`,
+            transitionDelay: `${(1 - dist / maxDist) * dismissSpan}ms`,
           };
         }
 
@@ -115,13 +123,18 @@ export default function FaceGrid({
           <button
             key={`${gen}-${i}`}
             className={dismissIndex == null ? "cell bloom" : "cell"}
-            style={{ animationDelay: `${p.rank * 7}ms`, ...dismissStyle }}
+            style={{ animationDelay: `${p.rank * bloomStep}ms`, ...dismissStyle }}
             onClick={(e) =>
               onReveal(face, i, e.currentTarget.getBoundingClientRect())
             }
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={face.thumbUrl} alt="face" loading="lazy" />
+            <img
+              src={face.thumbUrl}
+              alt="face"
+              loading="lazy"
+              style={faceZoom !== 1 ? { transform: `scale(${faceZoom})` } : undefined}
+            />
           </button>
         );
       })}

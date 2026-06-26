@@ -14,6 +14,10 @@ export const config = {
   embedModel: process.env.EMBED_MODEL || "gemini-embedding-2",
   embedDim: num(process.env.EMBED_DIM, 768),
 
+  // How much breathing room to leave around each detected face when cropping —
+  // fraction of the face box added on every side (0.3 = 30% margin all round).
+  cropMargin: num(process.env.CROP_MARGIN, 0.3),
+
   // Thumbnail sizes.
   thumbSize: 256, // square-ish face thumbnail (longest edge)
   fullThumbMax: 1400, // longest edge of the full-image thumbnail
