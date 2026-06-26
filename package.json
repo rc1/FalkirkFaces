@@ -12,7 +12,8 @@
     "crop": "tsx --env-file-if-exists=.env scripts/crop-faces.ts",
     "embed": "tsx --env-file-if-exists=.env scripts/embed-faces.ts",
     "rebuild": "tsx --env-file-if-exists=.env scripts/rebuild-index.ts",
-    "gen-expressions": "tsx scripts/gen-expressions.ts"
+    "gen-expressions": "tsx scripts/gen-expressions.ts",
+    "gen-icons": "tsx scripts/gen-icons.ts"
   },
   "dependencies": {
     "@google/genai": "^1.9.0",

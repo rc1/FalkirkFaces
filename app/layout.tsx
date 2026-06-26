@@ -1,9 +1,31 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import SWRegister from "@/components/SWRegister";
 
 export const metadata: Metadata = {
-  title: "Art Face Explorer",
-  description: "Expressive, art-based exploration of faces found in a folder.",
+  title: "Falkirk Faces",
+  description: "Search a crowd by expression.",
+  manifest: "/manifest.webmanifest",
+  applicationName: "Falkirk Faces",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Falkirk Faces",
+  },
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
+  // Explicit Apple flag for older iOS (Next emits only mobile-web-app-capable).
+  other: { "apple-mobile-web-app-capable": "yes" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#08080a",
+  width: "device-width",
+  initialScale: 1,
+  // Fill the notch/safe areas so the standalone app feels full-screen.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -13,7 +35,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <SWRegister />
+      </body>
     </html>
   );
 }

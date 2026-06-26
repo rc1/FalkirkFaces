@@ -85,7 +85,7 @@ body {
 .search-dock {
   position: fixed;
   left: 50%;
-  bottom: 30px;
+  bottom: calc(30px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   z-index: 30;
   display: flex;
