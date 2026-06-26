@@ -119,7 +119,6 @@ export default function FaceGrid({
             onClick={(e) =>
               onReveal(face, i, e.currentTarget.getBoundingClientRect())
             }
-            title={face.sourceImageFilename}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={face.thumbUrl} alt="face" loading="lazy" />
