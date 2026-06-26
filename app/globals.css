@@ -362,8 +362,15 @@ body {
   cursor: zoom-out;
   transition: background 0.6s ease;
 }
-.reveal-img {
+.reveal-clip {
   position: fixed;
+  overflow: hidden;
+  will-change: left, top, width, height;
+}
+.reveal-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   transform-origin: 0 0;
   display: block;
   will-change: transform;

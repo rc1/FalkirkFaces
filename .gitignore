@@ -17,6 +17,7 @@ volumes/manifest.json
 volumes/detections.json
 volumes/images.json
 volumes/insightface-cache
+volumes/embed-cache.json
 
 # The PDF + extracted source photos are inputs, not committed here.
 *.pdf

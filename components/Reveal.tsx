@@ -3,28 +3,31 @@
 import { useEffect, useMemo, useState } from "react";
 import type { FaceView } from "@/lib/types";
 
-// Seamless zoom: the clicked face (already framed inside its tile) expands until
-// the whole source image fits the screen. The full image is positioned so its
-// face region overlays the tile at the start, then the transform animates to
-// identity. The image also fades in as it grows and fades out as it returns, so
-// the hand-off with the grid is a soft cross-fade rather than a snap.
+// Click a face → the source photo appears EXACTLY where the tile was (a clipped
+// window showing the same crop), fades in, lingers a beat so the eye connects
+// it to the tile, then the window grows + the image un-zooms until the whole
+// photo fits the screen. Reverse on close. The clip means nothing spills around
+// the tile during the "it came from here" moment.
+
+const APPEAR_MS = 200; // opacity fade-in at the tile
 
 export default function Reveal({
   face,
   rect,
   onClosingStart,
   onClose,
-  fadeDelay = 380, // let the grid clear a little before we expand
+  fadeDelay = 520, // time held at the tile before expanding
   zoomMs = 700,
 }: {
   face: FaceView;
   rect: DOMRect;
-  onClosingStart: () => void; // tell the grid to start coming back
-  onClose: () => void; // unmount once the return animation finishes
+  onClosingStart: () => void;
+  onClose: () => void;
   fadeDelay?: number;
   zoomMs?: number;
 }) {
-  const [open, setOpen] = useState(false);
+  const [vis, setVis] = useState(false); // opacity
+  const [expanded, setExpanded] = useState(false); // grown to full
   const [closing, setClosing] = useState(false);
 
   const geo = useMemo(() => {
@@ -35,25 +38,30 @@ export default function Reveal({
     const scale = Math.min(vw / sw, vh / sh);
     const dispW = sw * scale;
     const dispH = sh * scale;
-    const finalLeft = (vw - dispW) / 2;
-    const finalTop = (vh - dispH) / 2;
 
-    const b = face.bbox;
-    const S = rect.width / (b.width * scale);
-    const TX = rect.left - finalLeft - S * (b.x * scale);
-    const TY = rect.top - finalTop - S * (b.y * scale);
+    const b = face.bbox; // square padded crop region == what the tile shows
+    const fx = b.x * scale;
+    const fy = b.y * scale;
+    const fw = b.width * scale;
+    const s = rect.width / fw; // scale so the crop fills the tile-sized window
 
     return {
-      style: { left: finalLeft, top: finalTop, width: dispW, height: dispH } as React.CSSProperties,
-      initial: `translate(${TX}px, ${TY}px) scale(${S})`,
+      // the clipping window: tile rect → fitted-image rect
+      cellClip: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+      fullClip: { left: (vw - dispW) / 2, top: (vh - dispH) / 2, width: dispW, height: dispH },
+      imgSize: { width: dispW, height: dispH },
+      // image transform inside the window: crop-fills-tile → image-fills-window
+      imgInitial: `translate(${-s * fx}px, ${-s * fy}px) scale(${s})`,
     };
   }, [face, rect]);
 
   useEffect(() => {
-    const t = setTimeout(() => setOpen(true), fadeDelay);
+    const r = requestAnimationFrame(() => setVis(true)); // fade in at the tile
+    const t = setTimeout(() => setExpanded(true), fadeDelay); // then expand
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     window.addEventListener("keydown", onKey);
     return () => {
+      cancelAnimationFrame(r);
       clearTimeout(t);
       window.removeEventListener("keydown", onKey);
     };
@@ -63,31 +71,46 @@ export default function Reveal({
   function close() {
     if (closing) return;
     setClosing(true);
-    setOpen(false);
-    onClosingStart(); // grid fades back in while the image fades out + shrinks
+    setExpanded(false); // window + image return to the tile
+    onClosingStart(); // grid fades back in meanwhile
     setTimeout(onClose, zoomMs);
   }
 
-  const expanded = open && !closing;
+  const big = expanded && !closing;
+  const clip = big ? geo.fullClip : geo.cellClip;
+  const ease = "cubic-bezier(0.22,0.61,0.36,1)";
+  const opacityMs = closing ? Math.round(zoomMs * 0.6) : APPEAR_MS;
 
   return (
     <div
       className="reveal"
       onClick={close}
-      style={{ background: expanded ? "rgba(6,6,8,1)" : "rgba(6,6,8,0)" }}
+      style={{ background: big ? "rgba(6,6,8,1)" : "rgba(6,6,8,0)" }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className="reveal-img"
-        src={face.fullUrl}
-        alt=""
+      <div
+        className="reveal-clip"
         style={{
-          ...geo.style,
-          transform: expanded ? "none" : geo.initial,
-          opacity: expanded ? 1 : 0,
-          transition: `transform ${zoomMs}ms cubic-bezier(0.22,0.61,0.36,1), opacity ${Math.round(zoomMs * 0.7)}ms ease`,
+          left: clip.left,
+          top: clip.top,
+          width: clip.width,
+          height: clip.height,
+          opacity: closing ? 0 : vis ? 1 : 0,
+          transition: `left ${zoomMs}ms ${ease}, top ${zoomMs}ms ${ease}, width ${zoomMs}ms ${ease}, height ${zoomMs}ms ${ease}, opacity ${opacityMs}ms ease`,
         }}
-      />
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="reveal-img"
+          src={face.fullUrl}
+          alt=""
+          style={{
+            width: geo.imgSize.width,
+            height: geo.imgSize.height,
+            transform: big ? "none" : geo.imgInitial,
+            transition: `transform ${zoomMs}ms ${ease}`,
+          }}
+        />
+      </div>
     </div>
   );
 }
