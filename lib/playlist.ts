@@ -29,30 +29,31 @@ const FALKIRK: string[] = [
   "weary resignation",
 ];
 
-// Feeling Scotland: 19th-century portraiture held still by long exposures —
-// almost no smiles, a deep mass of pensive/stoic/guarded gazes, faraway looks,
-// weathered age, the odd soldier's distant stare and a rare smile at the edge.
+// Feeling Scotland: derived by probing the embedding space with a 155-word
+// feeling lexicon and DOUBLE-CENTRING out the content baseline (medium/era), so
+// these are the feelings that genuinely *discriminate* faces here — one per
+// synonym-island, chosen to span the emotional range (scripts/analyze-emotions.ts).
 const SCOTLAND: string[] = [
-  "a pensive stare",
-  "stoic dignity",
-  "a faraway look",
-  "weary resignation",
-  "guarded watchfulness",
-  "quiet melancholy",
-  "stern authority",
-  "a wry half-smile",
-  "lost in thought",
-  "weathered by time",
-  "solemn composure",
-  "the thousand-yard stare",
-  "gentle and kind",
-  "proud bearing",
-  "haunted eyes",
-  "a knowing glance",
-  "youthful uncertainty",
-  "grim determination",
-  "soft sorrow",
-  "a rare, fleeting smile",
+  "wistfulness",
+  "wide-eyed alarm",
+  "stoicism",
+  "suppressed grief",
+  "defiance",
+  "gentleness",
+  "contempt",
+  "dreaminess",
+  "dread",
+  "fascination",
+  "sternness",
+  "a haunted look",
+  "mischief",
+  "austerity",
+  "vigilance",
+  "quiet delight",
+  "indignation",
+  "detachment",
+  "patience",
+  "deep absorption",
 ];
 
 export const PLAYLISTS: Record<string, string[]> = {
