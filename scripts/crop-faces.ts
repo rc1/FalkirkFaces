@@ -10,7 +10,7 @@ import {
   squareBox,
 } from "../lib/images";
 import { writeManifest } from "../lib/manifest";
-import type { ExcludeReason, Face } from "../lib/types";
+import type { ExcludeReason, Face, Source } from "../lib/types";
 
 // Step 3: turn raw detections into faces. Apply thresholds, crop included
 // faces, generate thumbnails, and write the manifest. Excluded faces are kept
@@ -44,6 +44,12 @@ async function main() {
   for (const dir of [paths.crops, paths.thumbs, paths.fullThumbs]) {
     fs.mkdirSync(dir, { recursive: true });
   }
+
+  // Optional provenance/rights sidecar (heritage corpora like NLS).
+  const sourcesPath = path.join(paths.data, "sources.json");
+  const sources: Record<string, Source> = fs.existsSync(sourcesPath)
+    ? JSON.parse(fs.readFileSync(sourcesPath, "utf8"))
+    : {};
 
   const now = new Date().toISOString();
   const faces: Face[] = [];
@@ -98,6 +104,7 @@ async function main() {
         detectorConfidence: d.confidence,
         caption: null,
         expressionLabel: null,
+        source: sources[img.filename] || null,
         embedding: null,
         createdAt: now,
       };

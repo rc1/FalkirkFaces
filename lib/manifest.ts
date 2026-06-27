@@ -50,6 +50,7 @@ export function toView(f: Face, score?: number): FaceView {
     cropHeight: f.cropHeight,
     caption: f.caption,
     expressionLabel: f.expressionLabel,
+    source: f.source ?? null,
     ...(score !== undefined ? { score } : {}),
   };
 }

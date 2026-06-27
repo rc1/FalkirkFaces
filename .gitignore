@@ -25,3 +25,6 @@ photos
 
 # Build info
 *.tsbuildinfo
+
+# Second corpus (Feeling Scotland) — harvested data, not committed
+scotland

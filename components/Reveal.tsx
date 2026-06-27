@@ -111,6 +111,22 @@ export default function Reveal({
           }}
         />
       </div>
+
+      {/* Provenance — heritage faces are never shown stripped of attribution. */}
+      {big && face.source && (
+        <div className="reveal-credit" onClick={(e) => e.stopPropagation()}>
+          {face.source.label && <span>{face.source.label}</span>}
+          {face.source.rights && <span> · {face.source.rights}</span>}
+          {face.source.sourceUrl && (
+            <>
+              {" · "}
+              <a href={face.source.sourceUrl} target="_blank" rel="noreferrer">
+                National Library of Scotland ↗
+              </a>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

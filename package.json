@@ -13,7 +13,8 @@
     "embed": "tsx --env-file-if-exists=.env scripts/embed-faces.ts",
     "rebuild": "tsx --env-file-if-exists=.env scripts/rebuild-index.ts",
     "gen-expressions": "tsx scripts/gen-expressions.ts",
-    "gen-icons": "tsx scripts/gen-icons.ts"
+    "gen-icons": "tsx scripts/gen-icons.ts",
+    "harvest": "tsx scripts/harvest-nls.ts"
   },
   "dependencies": {
     "@google/genai": "^1.9.0",

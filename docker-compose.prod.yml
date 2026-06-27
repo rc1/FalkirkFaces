@@ -1,25 +1,28 @@
-# Production deploy — behind the existing Traefik v2 on the external `web`
-# network (matches the other electricglen.com apps). Gated by HTTP basic auth.
+# Production deploy — parameterised so one file serves every corpus. Each stack
+# directory on the server has its own .env supplying PROJECT_NAME / APP_DOMAIN /
+# APP_NAME / GEMINI_API_KEY, plus its own photos/ + volumes/. Defaults below keep
+# the original Falkirk Faces deploy working unchanged.
 #
-#   falkirkfaces.electricglen.com  ->  user: cellardyke  pass: cellardyke
+#   docker compose -f docker-compose.prod.yml up -d --build
 #
-# Source images + generated index are bind-mounted from this directory, so rsync
-# ./photos and ./volumes here (and a .env holding GEMINI_API_KEY) before bringing
-# it up:  docker compose -f docker-compose.prod.yml up -d --build
-name: falkirkface
+# Behind the shared Traefik v2 on the external `web` network. Basic-auth gated:
+#   user: cellardyke   pass: cellardyke
+name: ${PROJECT_NAME:-falkirkface}
 services:
-  falkirkface:
+  app:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    image: falkirkface:local
-    container_name: falkirkface
+    image: ${PROJECT_NAME:-falkirkface}:local
+    container_name: ${PROJECT_NAME:-falkirkface}
     restart: always
     env_file: .env
     environment:
       - NODE_ENV=production
       - SOURCE_DIR=/app/photos
       - DATA_DIR=/app/volumes
+      - APP_NAME=${APP_NAME:-Falkirk Faces}
+      - APP_TAGLINE=${APP_TAGLINE:-Search a crowd by expression.}
     volumes:
       - ./photos:/app/photos:ro
       - ./volumes:/app/volumes
@@ -27,13 +30,13 @@ services:
       - web
     labels:
       - traefik.enable=true
-      - traefik.http.routers.falkirkface.rule=Host(`falkirkfaces.electricglen.com`)
-      - traefik.http.routers.falkirkface.entrypoints=websecure
-      - traefik.http.routers.falkirkface.tls=true
-      - traefik.http.routers.falkirkface.tls.certresolver=lets-encrypt
-      - traefik.http.routers.falkirkface.middlewares=falkirkface-auth
-      - traefik.http.middlewares.falkirkface-auth.basicauth.users=cellardyke:$$2y$$05$$LsKzOAqQFKnpTMjB08.H7.ZKilT0DGjP40.3SvxhIwhJAr.qKQiAi
-      - traefik.http.services.falkirkface.loadbalancer.server.port=8080
+      - traefik.http.routers.${PROJECT_NAME:-falkirkface}.rule=Host(`${APP_DOMAIN:-falkirkfaces.electricglen.com}`)
+      - traefik.http.routers.${PROJECT_NAME:-falkirkface}.entrypoints=websecure
+      - traefik.http.routers.${PROJECT_NAME:-falkirkface}.tls=true
+      - traefik.http.routers.${PROJECT_NAME:-falkirkface}.tls.certresolver=lets-encrypt
+      - traefik.http.routers.${PROJECT_NAME:-falkirkface}.middlewares=${PROJECT_NAME:-falkirkface}-auth
+      - traefik.http.middlewares.${PROJECT_NAME:-falkirkface}-auth.basicauth.users=cellardyke:$$2y$$05$$LsKzOAqQFKnpTMjB08.H7.ZKilT0DGjP40.3SvxhIwhJAr.qKQiAi
+      - traefik.http.services.${PROJECT_NAME:-falkirkface}.loadbalancer.server.port=8080
 
 networks:
   web:
