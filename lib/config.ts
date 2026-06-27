@@ -12,6 +12,9 @@ export const config = {
     shortName:
       process.env.APP_SHORT_NAME || process.env.APP_NAME || "Falkirk Faces",
     tagline: process.env.APP_TAGLINE || "Search a crowd by expression.",
+    // Render the imagery in black & white (CSS filter) — for mixed sepia/tone
+    // heritage corpora. Build-time flag (baked into the server-rendered body).
+    monochrome: /^(1|true|yes)$/i.test(process.env.APP_MONOCHROME || ""),
   },
 
   // Filtering — faces below these are kept in the manifest but marked excluded.

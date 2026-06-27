@@ -81,6 +81,17 @@ body {
   filter: brightness(1.12);
 }
 
+/* Monochrome corpus — black & white via CSS filter (mixed sepia heritage). */
+.mono .cell img {
+  filter: grayscale(1);
+}
+.mono .cell:not(.empty):hover img {
+  filter: grayscale(1) brightness(1.12);
+}
+.mono .reveal-img {
+  filter: grayscale(1);
+}
+
 /* ---- Floating search dock -------------------------------------------- */
 .search-dock {
   position: fixed;

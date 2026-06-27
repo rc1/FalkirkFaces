@@ -36,7 +36,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className={config.app.monochrome ? "mono" : undefined}>
         {children}
         <SWRegister />
       </body>

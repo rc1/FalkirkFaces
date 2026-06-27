@@ -15,8 +15,10 @@ COPY . .
 # the corpus name must be present as a build arg, not just a runtime env.
 ARG APP_NAME="Falkirk Faces"
 ARG APP_TAGLINE="Search a crowd by expression."
+ARG APP_MONOCHROME=""
 ENV APP_NAME=$APP_NAME
 ENV APP_TAGLINE=$APP_TAGLINE
+ENV APP_MONOCHROME=$APP_MONOCHROME
 RUN npm run build
 
 ENV NODE_ENV=production
