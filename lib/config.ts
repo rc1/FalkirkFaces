@@ -5,6 +5,15 @@ const num = (v: string | undefined, d: number) =>
   v !== undefined && v !== "" ? Number(v) : d;
 
 export const config = {
+  // Corpus / branding — the "switch for different data". Same code, different
+  // env per deployment (Falkirk Faces, Feeling Scotland, …).
+  app: {
+    name: process.env.APP_NAME || "Falkirk Faces",
+    shortName:
+      process.env.APP_SHORT_NAME || process.env.APP_NAME || "Falkirk Faces",
+    tagline: process.env.APP_TAGLINE || "Search a crowd by expression.",
+  },
+
   // Filtering — faces below these are kept in the manifest but marked excluded.
   minFaceWidth: num(process.env.MIN_FACE_WIDTH, 96),
   minFaceHeight: num(process.env.MIN_FACE_HEIGHT, 96),

@@ -1,16 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SWRegister from "@/components/SWRegister";
+import { config } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Falkirk Faces",
-  description: "Search a crowd by expression.",
+  title: config.app.name,
+  description: config.app.tagline,
   manifest: "/manifest.webmanifest",
-  applicationName: "Falkirk Faces",
+  applicationName: config.app.name,
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Falkirk Faces",
+    title: config.app.name,
   },
   icons: {
     icon: "/icons/icon-192.png",
