@@ -13,6 +13,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
+      args:
+        APP_NAME: ${APP_NAME:-Falkirk Faces}
+        APP_TAGLINE: ${APP_TAGLINE:-Search a crowd by expression.}
     image: ${PROJECT_NAME:-falkirkface}:local
     container_name: ${PROJECT_NAME:-falkirkface}
     restart: always

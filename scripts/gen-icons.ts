@@ -6,7 +6,7 @@ import path from "node:path";
 // public/icons and are committed (no runtime dependency on the crop). Re-run
 // with `npm run gen-icons` if you want a different source face.
 const SRC = process.argv[2] || "volumes/crops/8aec2121e9709071.jpg";
-const OUT = "public/icons";
+const OUT = process.env.ICON_OUT || "public/icons";
 const BG = { r: 8, g: 8, b: 10, alpha: 1 }; // app background #08080a
 
 async function full(size: number, name: string) {
