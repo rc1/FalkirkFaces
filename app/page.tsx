@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FaceView } from "@/lib/types";
 import SearchBox from "@/components/SearchBox";
+import Webcam from "@/components/Webcam";
 import FaceGrid from "@/components/FaceGrid";
 import Reveal from "@/components/Reveal";
 import DebugPanel, { DEFAULT_DBG, type Dbg } from "@/components/DebugPanel";
@@ -16,6 +17,7 @@ export default function Home() {
   const [gen, setGen] = useState(0);
   const [query, setQuery] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [webcam, setWebcam] = useState(false);
   const [fs, setFs] = useState(false);
   const [dbg, setDbg] = useState<Dbg>(DEFAULT_DBG);
   const [dbgOpen, setDbgOpen] = useState(false);
@@ -137,6 +139,28 @@ export default function Home() {
     setQuery(v);
   };
 
+  // Search the corpus for faces resembling a captured webcam frame.
+  const searchImage = useCallback(async (dataUrl: string) => {
+    const res = await fetch("/api/search-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: dataUrl, limit: 200 }),
+    });
+    const data = await res.json();
+    if (!data.error) {
+      setFaces(data.faces);
+      setRadial(true);
+      setGen((g) => g + 1);
+    }
+  }, []);
+
+  // Toggle webcam mode (stops the play-cycle; takes over the input).
+  const toggleWebcam = () => {
+    acted.current = true;
+    setPlaying(false);
+    setWebcam((w) => !w);
+  };
+
   return (
     <main className="screen">
       <FaceGrid
@@ -180,23 +204,36 @@ export default function Home() {
           )}
         </button>
 
-        <SearchBox
-          value={query}
-          onValueChange={onUserChange}
-          onSearch={load}
-          playing={playing}
-        />
+        {webcam ? (
+          <Webcam onCapture={searchImage} />
+        ) : (
+          <SearchBox
+            value={query}
+            onValueChange={onUserChange}
+            onSearch={load}
+            playing={playing}
+          />
+        )}
 
+        {/* Play / pause / stop. In webcam mode this is the stop button. */}
         <button
-          className={`dock-btn ${playing ? "on" : ""}`}
+          className={`dock-btn ${playing || webcam ? "on" : ""}`}
           onClick={() => {
-            acted.current = true;
-            setPlaying((p) => !p);
+            if (webcam) {
+              setWebcam(false);
+            } else {
+              acted.current = true;
+              setPlaying((p) => !p);
+            }
           }}
-          aria-label={playing ? "stop play" : "play expressions"}
-          title={playing ? "Stop" : "Play through expressions"}
+          aria-label={webcam ? "stop webcam" : playing ? "stop play" : "play expressions"}
+          title={webcam ? "Stop" : playing ? "Stop" : "Play through expressions"}
         >
-          {playing ? (
+          {webcam ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="5" y="5" width="14" height="14" rx="2" />
+            </svg>
+          ) : playing ? (
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
               <rect x="6" y="5" width="4" height="14" rx="1" />
               <rect x="14" y="5" width="4" height="14" rx="1" />
@@ -206,6 +243,19 @@ export default function Home() {
               <path d="M7 5l12 7-12 7V5z" />
             </svg>
           )}
+        </button>
+
+        {/* Webcam: find the faces most like the person in front of the camera. */}
+        <button
+          className={`dock-btn ${webcam ? "on" : ""}`}
+          onClick={toggleWebcam}
+          aria-label="webcam search"
+          title="Find faces like yours"
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+            <circle cx="12" cy="13" r="4" />
+          </svg>
         </button>
       </div>
 

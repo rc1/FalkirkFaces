@@ -106,6 +106,18 @@ body {
   width: auto;
 }
 
+/* Small rounded webcam window, replacing the input in webcam mode. */
+.webcam-view {
+  width: 200px;
+  height: 120px;
+  border-radius: 16px;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror — natural selfie view */
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
 /* Icon buttons next to the input (fullscreen, play). */
 .dock-btn {
   flex: none;

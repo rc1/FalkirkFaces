@@ -80,11 +80,19 @@ export async function embedText(text: string): Promise<number[]> {
   return vec;
 }
 
+/** Embed raw image bytes (base64). Used by the live webcam search. */
+export async function embedImageBytes(
+  b64: string,
+  mime = "image/jpeg",
+): Promise<number[]> {
+  return embed([{ inlineData: { mimeType: mime, data: b64 } }]);
+}
+
 /** Embed a face-crop image file directly (pipeline use; not cached). */
 export async function embedImageFile(filePath: string): Promise<number[]> {
   const b64 = fs.readFileSync(filePath).toString("base64");
   const ext = filePath.toLowerCase().endsWith(".png")
     ? "image/png"
     : "image/jpeg";
-  return embed([{ inlineData: { mimeType: ext, data: b64 } }]);
+  return embedImageBytes(b64, ext);
 }
