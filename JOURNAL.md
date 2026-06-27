@@ -153,3 +153,22 @@ at the bottom. Maintained by Claude at Ross's request.
 - Scotland: pensiveness · dreaminess · contemplation · a haunted look · solemnity ·
   gravity · stoicism · sternness · austerity · disdain · indignation · fury · terror ·
   defiance · resolve · weariness · vacancy · gentleness.
+
+## 2026-06-27 — Webcam search (both sites)
+
+- Added a **camera button**: replaces the input with a small rounded webcam
+  window, the play button becomes a stop button, and every 10s it captures a
+  frame and searches the corpus for the most similar faces.
+- `/api/search-image` embeds an image (webcam frame) via Gemini and runs the same
+  LanceDB nearest-neighbour search. `embedImageBytes()` added. Deployed to both.
+
+## 2026-06-27 — YCBA "Feeling Britain" corpus (in progress)
+
+- New corpus from the Yale Center for British Art (open-access British art).
+- Verified endpoints (subagent): OAI-PMH `harvester-bl.britishart.yale.edu/
+  oaicatmuseum/OAIHandler` (LIDO, sets `ycba:ps` + `ycba:pd`); rights in
+  `<lido:rightsWorkSet>` (Public Domain / CC0); production date `<lido:latestDate>`;
+  IIIF images via manifest `manifests.collections.yale.edu/ycba/obj/{TMS_ID}` →
+  `images.collections.yale.edu/iiif/2/{id}/full/!1280,1280/0/default.jpg`.
+- `scripts/harvest-ycba.ts`: OAI harvest ps+pd → filter PD + ≤1949 + people-subject
+  → resolve manifest → download. Target ~7k face-bearing works.
