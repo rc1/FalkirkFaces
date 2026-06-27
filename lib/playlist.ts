@@ -25,7 +25,7 @@ const FALKIRK: string[] = [
   "awe",
   "tension",
   "determination",
-  "shock",
+  "fury",
   "lost in the moment",
 ];
 
