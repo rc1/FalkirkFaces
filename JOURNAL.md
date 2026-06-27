@@ -136,3 +136,20 @@ at the bottom. Maintained by Claude at Ross's request.
   are openly licensed) while **Falkirk stays password-gated** (a friend's private
   photos). Both redeployed. Note: the Falkirk redeploy needed an old-container
   removal because the compose service was renamed `falkirkface` → `app`.
+
+## 2026-06-27 — Validated + rebuilt both playlists (not guessed)
+
+- Ross asked whether the Falkirk playlist actually mapped to the embedding-space
+  islands or was a guess. Honest answer: I'd guessed the fan-friendly rephrasing.
+- Built `scripts/validate-playlist.ts` (per-phrase strength + pairwise top-K
+  overlap + candidate scoring) and `scripts/build-playlist.ts` (greedy
+  max-distinct selection from a corpus-appropriate pool — Falkirk pool kept
+  flattering, Scotland pool left broad).
+- Rebuilt BOTH playlists from the data and re-validated independently: no
+  redundant pairs; mean top-K overlap 0.067 (Falkirk) / 0.033 (Scotland).
+- Falkirk: pure joy · ecstasy · triumph · astonishment · anticipation · suspense ·
+  nerves · tension · indignation · fury · despair · resignation · longing · relief ·
+  passion · determination · rapt attention · lost in the moment.
+- Scotland: pensiveness · dreaminess · contemplation · a haunted look · solemnity ·
+  gravity · stoicism · sternness · austerity · disdain · indignation · fury · terror ·
+  defiance · resolve · weariness · vacancy · gentleness.
