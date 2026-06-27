@@ -120,3 +120,19 @@ at the bottom. Maintained by Claude at Ross's request.
 
 - Ross asked for a running journal of the work. Created this file; will append an
   entry per significant task going forward. (See `memory/journal-habit.md`.)
+
+## 2026-06-27 — Falkirk playlist + autoplay + per-stack auth
+
+- Ran the emotion analysis on the Falkirk corpus too; reported the proposed
+  playlist first. Ross wanted it more **fan-relatable** (not clinical — "nobody
+  wants their face under 'menace'"). Reframed around the supporter's emotional
+  rollercoaster: pure joy · ecstasy · disbelief · agony · elation · heartbreak ·
+  outrage · triumph · anticipation · delight · despair · relief · pride · awe ·
+  tension · determination · shock · lost in the moment.
+- **Auto-play on load**: the play-cycle now auto-starts ~7s after load (yields if
+  the visitor types/clicks/hits play first). The "Enter an expression" hint stays
+  up longer (7s) to match.
+- **Per-stack auth** via `AUTH_MW`: **Feeling Scotland is now public** (the images
+  are openly licensed) while **Falkirk stays password-gated** (a friend's private
+  photos). Both redeployed. Note: the Falkirk redeploy needed an old-container
+  removal because the compose service was renamed `falkirkface` → `app`.
