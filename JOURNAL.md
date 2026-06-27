@@ -172,3 +172,14 @@ at the bottom. Maintained by Claude at Ross's request.
   `images.collections.yale.edu/iiif/2/{id}/full/!1280,1280/0/default.jpg`.
 - `scripts/harvest-ycba.ts`: OAI harvest ps+pd → filter PD + ≤1949 + people-subject
   → resolve manifest → download. Target ~7k face-bearing works.
+
+## 2026-06-27 — Webcam tweaks + YCBA full harvest launched
+
+- Webcam: capture every **5s** with a subtle in-window 5→1 countdown then a
+  flash to black; camera button now **hidden by default**, opt-in via `?webcam`
+  in the URL. Deployed to both Falkirk + Feeling Scotland.
+- YCBA harvester: fixed a resumption-token double-encoding bug (discovery had
+  stopped at page 1) and a title-parse miss; added early-stop once enough records
+  are kept. Validated (cap-150 run). Launched full **7,000**-image background
+  harvest (PD/CC0, ≤1949, people-subject). Pipeline + deploy of
+  feelingbritain.electricglen.com to follow when it completes.
