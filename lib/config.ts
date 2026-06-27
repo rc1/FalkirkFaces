@@ -15,6 +15,8 @@ export const config = {
     // Render the imagery in black & white (CSS filter) — for mixed sepia/tone
     // heritage corpora. Build-time flag (baked into the server-rendered body).
     monochrome: /^(1|true|yes)$/i.test(process.env.APP_MONOCHROME || ""),
+    // Which play-cycle playlist to use (see lib/playlist.ts). Runtime env.
+    corpus: (process.env.APP_CORPUS || "falkirk").toLowerCase(),
   },
 
   // Filtering — faces below these are kept in the manifest but marked excluded.

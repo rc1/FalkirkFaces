@@ -6,7 +6,6 @@ import SearchBox from "@/components/SearchBox";
 import FaceGrid from "@/components/FaceGrid";
 import Reveal from "@/components/Reveal";
 import DebugPanel, { DEFAULT_DBG, type Dbg } from "@/components/DebugPanel";
-import { PLAYLIST } from "@/lib/playlist";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -19,6 +18,7 @@ export default function Home() {
   const [fs, setFs] = useState(false);
   const [dbg, setDbg] = useState<Dbg>(DEFAULT_DBG);
   const [dbgOpen, setDbgOpen] = useState(false);
+  const [playlist, setPlaylist] = useState<string[]>([]);
   const dbgRef = useRef(dbg);
   dbgRef.current = dbg; // play loop reads this without re-subscribing
   const [revealed, setRevealed] = useState<{
@@ -51,16 +51,21 @@ export default function Home() {
 
   useEffect(() => {
     load("");
+    // Corpus-specific play-cycle phrases.
+    fetch("/api/playlist")
+      .then((r) => r.json())
+      .then((d) => setPlaylist(d.playlist || []))
+      .catch(() => {});
   }, [load]);
 
   // Play-cycle: type an expression letter by letter, search it, hold, advance.
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || playlist.length === 0) return;
     let cancelled = false;
     (async () => {
       let idx = 0;
       while (!cancelled) {
-        const phrase = PLAYLIST[idx % PLAYLIST.length];
+        const phrase = playlist[idx % playlist.length];
         for (let i = 1; i <= phrase.length; i++) {
           if (cancelled) return;
           setQuery(phrase.slice(0, i));
@@ -75,7 +80,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [playing, load]);
+  }, [playing, load, playlist]);
 
   // Track fullscreen state so the icon reflects reality.
   useEffect(() => {
