@@ -135,7 +135,7 @@ async function main() {
       const imgId = svc.split("/iiif/2/")[1] || svc.split("/").pop();
       const fname = "nls-" + decodeURIComponent(imgId).replace(/[^\w.\-]+/g, "_") + ".jpg";
       const dest = path.join(SRC, fname);
-      sources[fname] = { label, manifestUrl: mUrl, rights: r.rights, rightsUrl: r.rightsUrl, attribution, sourceUrl };
+      sources[fname] = { institution: "National Library of Scotland", label, manifestUrl: mUrl, rights: r.rights, rightsUrl: r.rightsUrl, attribution, sourceUrl };
       if (fs.existsSync(dest)) {
         kept++;
         continue;

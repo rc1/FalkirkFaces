@@ -19,6 +19,7 @@ export type ExcludeReason =
 // the Falkirk corpus has none. Carried through so faces are never shown stripped
 // of attribution.
 export interface Source {
+  institution: string | null; // e.g. "National Library of Scotland"
   label: string | null; // human title of the source object
   rights: string | null; // e.g. "CC BY 4.0", "Public Domain"
   rightsUrl: string | null;

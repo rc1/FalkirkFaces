@@ -117,14 +117,17 @@ export default function Reveal({
         <div className="reveal-credit" onClick={(e) => e.stopPropagation()}>
           {face.source.label && <span>{face.source.label}</span>}
           {face.source.rights && <span> · {face.source.rights}</span>}
-          {face.source.sourceUrl && (
-            <>
-              {" · "}
-              <a href={face.source.sourceUrl} target="_blank" rel="noreferrer">
-                National Library of Scotland ↗
-              </a>
-            </>
-          )}
+          {face.source.institution &&
+            (face.source.sourceUrl ? (
+              <>
+                {" · "}
+                <a href={face.source.sourceUrl} target="_blank" rel="noreferrer">
+                  {face.source.institution} ↗
+                </a>
+              </>
+            ) : (
+              <span> · {face.source.institution}</span>
+            ))}
         </div>
       )}
     </div>
