@@ -8,6 +8,7 @@ import Reveal from "@/components/Reveal";
 import DebugPanel, { DEFAULT_DBG, type Dbg } from "@/components/DebugPanel";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const AUTOPLAY_DELAY = 7000; // show the hint, then start the play-cycle
 
 export default function Home() {
   const [faces, setFaces] = useState<FaceView[]>([]);
@@ -21,6 +22,7 @@ export default function Home() {
   const [playlist, setPlaylist] = useState<string[]>([]);
   const dbgRef = useRef(dbg);
   dbgRef.current = dbg; // play loop reads this without re-subscribing
+  const acted = useRef(false); // user interacted → don't auto-start
   const [revealed, setRevealed] = useState<{
     face: FaceView;
     index: number;
@@ -82,6 +84,16 @@ export default function Home() {
     };
   }, [playing, load, playlist]);
 
+  // Auto-start the play-cycle a few seconds after load (once the playlist is in),
+  // unless the visitor has already interacted.
+  useEffect(() => {
+    if (playlist.length === 0 || acted.current) return;
+    const t = setTimeout(() => {
+      if (!acted.current) setPlaying(true);
+    }, AUTOPLAY_DELAY);
+    return () => clearTimeout(t);
+  }, [playlist]);
+
   // Track fullscreen state so the icon reflects reality.
   useEffect(() => {
     const h = () => setFs(!!document.fullscreenElement);
@@ -120,6 +132,7 @@ export default function Home() {
 
   // User typing takes over from the play-cycle.
   const onUserChange = (v: string) => {
+    acted.current = true;
     if (playing) setPlaying(false);
     setQuery(v);
   };
@@ -129,6 +142,7 @@ export default function Home() {
       <FaceGrid
         faces={faces}
         onReveal={(face, index, rect) => {
+          acted.current = true;
           setPlaying(false); // clicking a face stops the play-cycle
           setRevealed({ face, index, rect });
           setDismiss(index);
@@ -175,7 +189,10 @@ export default function Home() {
 
         <button
           className={`dock-btn ${playing ? "on" : ""}`}
-          onClick={() => setPlaying((p) => !p)}
+          onClick={() => {
+            acted.current = true;
+            setPlaying((p) => !p);
+          }}
           aria-label={playing ? "stop play" : "play expressions"}
           title={playing ? "Stop" : "Play through expressions"}
         >

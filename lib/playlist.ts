@@ -4,29 +4,29 @@ import { config } from "./config";
 // groupings that actually exist in that data (found by clustering the
 // embeddings — see scripts/explore-clusters.ts).
 
-// Falkirk crowd: a distinct open-mouthed/roaring pocket, laughter, the big
-// neutral thousand-yard-stare mass, an intense/tearful group, squinting youth.
+// Falkirk crowd: the emotional rollercoaster of being a fan. Grounded in the
+// discriminating feelings the analysis found here (joy, triumph, disbelief,
+// terror, indignation, relief, shock…) but phrased the way a supporter feels
+// them — flattering and relatable, not clinical.
 const FALKIRK: string[] = [
-  "open-mouthed roar",
-  "helpless laughter",
-  "wide-eyed shock",
-  "thousand-yard stare",
-  "lost in thought",
-  "wry half-smile",
-  "deadpan blankness",
-  "quiet melancholy",
-  "welling tears",
-  "anguished grimace",
-  "gritted-teeth tension",
-  "hard glare",
-  "wary suspicion",
-  "rapt attention",
-  "open-mouthed awe",
-  "tender warmth",
-  "soft smile",
-  "squinting into the light",
-  "nostalgic faraway look",
-  "weary resignation",
+  "pure joy",
+  "ecstasy",
+  "disbelief",
+  "agony",
+  "elation",
+  "heartbreak",
+  "outrage",
+  "triumph",
+  "anticipation",
+  "delight",
+  "despair",
+  "relief",
+  "pride",
+  "awe",
+  "tension",
+  "determination",
+  "shock",
+  "lost in the moment",
 ];
 
 // Feeling Scotland: derived by probing the embedding space with a 155-word

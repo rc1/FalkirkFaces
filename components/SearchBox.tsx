@@ -35,7 +35,8 @@ export default function SearchBox({
   }, [value]);
 
   useEffect(() => {
-    const t = setTimeout(() => setHint(false), 4000);
+    // Keep the hint up until the auto-play cycle kicks in (~7s on load).
+    const t = setTimeout(() => setHint(false), 7000);
     return () => clearTimeout(t);
   }, []);
 

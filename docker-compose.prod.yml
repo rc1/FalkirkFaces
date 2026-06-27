@@ -38,7 +38,8 @@ services:
       - traefik.http.routers.${PROJECT_NAME:-falkirkface}.entrypoints=websecure
       - traefik.http.routers.${PROJECT_NAME:-falkirkface}.tls=true
       - traefik.http.routers.${PROJECT_NAME:-falkirkface}.tls.certresolver=lets-encrypt
-      - traefik.http.routers.${PROJECT_NAME:-falkirkface}.middlewares=${PROJECT_NAME:-falkirkface}-auth
+      # Auth is per-stack: AUTH_MW unset → gated (default); AUTH_MW="" → public.
+      - traefik.http.routers.${PROJECT_NAME:-falkirkface}.middlewares=${AUTH_MW-falkirkface-auth}
       - traefik.http.middlewares.${PROJECT_NAME:-falkirkface}-auth.basicauth.users=cellardyke:$$2y$$05$$LsKzOAqQFKnpTMjB08.H7.ZKilT0DGjP40.3SvxhIwhJAr.qKQiAi
       - traefik.http.services.${PROJECT_NAME:-falkirkface}.loadbalancer.server.port=8080
 
