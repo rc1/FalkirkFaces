@@ -107,15 +107,50 @@ body {
 }
 
 /* Small rounded webcam window, replacing the input in webcam mode. */
-.webcam-view {
+.webcam-wrap {
+  position: relative;
   width: 200px;
   height: 120px;
   border-radius: 16px;
-  object-fit: cover;
-  transform: scaleX(-1); /* mirror — natural selfie view */
+  overflow: hidden;
   background: #000;
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+.webcam-view {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* mirror — natural selfie view */
+  display: block;
+}
+.webcam-count {
+  position: absolute;
+  bottom: 5px;
+  right: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+.webcam-flash {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+.webcam-flash.on {
+  animation: camflash 0.42s ease both;
+}
+@keyframes camflash {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Icon buttons next to the input (fullscreen, play). */

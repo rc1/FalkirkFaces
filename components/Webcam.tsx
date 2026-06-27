@@ -1,35 +1,35 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-// Small rounded webcam window that replaces the search input. Captures a frame
-// every `intervalMs` and hands it to `onCapture` (which searches the corpus for
-// the most similar faces). First capture happens shortly after warm-up.
+// Small rounded webcam window that replaces the search input. Runs a 5-second
+// countdown shown subtly in the window, then flashes to black and captures a
+// frame, handing it to `onCapture` (which searches the corpus for similar faces).
+const SECONDS = 5;
+
 export default function Webcam({
   onCapture,
-  intervalMs = 10000,
 }: {
   onCapture: (dataUrl: string) => void;
-  intervalMs?: number;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [count, setCount] = useState(SECONDS);
+  const [flash, setFlash] = useState(false);
 
+  const capture = useCallback(() => {
+    const v = videoRef.current;
+    if (!v || !v.videoWidth) return;
+    const c = document.createElement("canvas");
+    c.width = v.videoWidth;
+    c.height = v.videoHeight;
+    c.getContext("2d")?.drawImage(v, 0, 0);
+    onCapture(c.toDataURL("image/jpeg", 0.8));
+  }, [onCapture]);
+
+  // Camera stream.
   useEffect(() => {
     let stream: MediaStream | null = null;
-    let timer: ReturnType<typeof setInterval> | null = null;
-    let first: ReturnType<typeof setTimeout> | null = null;
     let cancelled = false;
-
-    const capture = () => {
-      const v = videoRef.current;
-      if (!v || !v.videoWidth) return;
-      const c = document.createElement("canvas");
-      c.width = v.videoWidth;
-      c.height = v.videoHeight;
-      c.getContext("2d")?.drawImage(v, 0, 0);
-      onCapture(c.toDataURL("image/jpeg", 0.8));
-    };
-
     navigator.mediaDevices
       ?.getUserMedia({ video: { facingMode: "user" }, audio: false })
       .then((s) => {
@@ -42,18 +42,35 @@ export default function Webcam({
           videoRef.current.srcObject = s;
           videoRef.current.play().catch(() => {});
         }
-        first = setTimeout(capture, 1500); // first shot once warmed up
-        timer = setInterval(capture, intervalMs);
       })
       .catch(() => {});
-
     return () => {
       cancelled = true;
-      if (timer) clearInterval(timer);
-      if (first) clearTimeout(first);
       stream?.getTracks().forEach((t) => t.stop());
     };
-  }, [onCapture, intervalMs]);
+  }, []);
 
-  return <video ref={videoRef} className="webcam-view" muted playsInline />;
+  // Countdown ticker: 5→1, then flash + capture, then reset.
+  useEffect(() => {
+    const t = setInterval(() => {
+      setCount((c) => {
+        if (c <= 1) {
+          capture();
+          setFlash(true);
+          setTimeout(() => setFlash(false), 420);
+          return SECONDS;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [capture]);
+
+  return (
+    <div className="webcam-wrap">
+      <video ref={videoRef} className="webcam-view" muted playsInline />
+      <span className="webcam-count">{count}</span>
+      <div className={`webcam-flash ${flash ? "on" : ""}`} />
+    </div>
+  );
 }

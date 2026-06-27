@@ -18,6 +18,7 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [playing, setPlaying] = useState(false);
   const [webcam, setWebcam] = useState(false);
+  const [webcamEnabled, setWebcamEnabled] = useState(false); // ?webcam gate
   const [fs, setFs] = useState(false);
   const [dbg, setDbg] = useState<Dbg>(DEFAULT_DBG);
   const [dbgOpen, setDbgOpen] = useState(false);
@@ -105,9 +106,9 @@ export default function Home() {
 
   // Hidden debug trigger: backtick key, or ?debug in the URL.
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).has("debug")) {
-      setDbgOpen(true);
-    }
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("debug")) setDbgOpen(true);
+    if (params.has("webcam")) setWebcamEnabled(true); // opt-in webcam button
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (e.key === "`" && tag !== "INPUT") setDbgOpen((o) => !o);
@@ -245,18 +246,20 @@ export default function Home() {
           )}
         </button>
 
-        {/* Webcam: find the faces most like the person in front of the camera. */}
-        <button
-          className={`dock-btn ${webcam ? "on" : ""}`}
-          onClick={toggleWebcam}
-          aria-label="webcam search"
-          title="Find faces like yours"
-        >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-            <circle cx="12" cy="13" r="4" />
-          </svg>
-        </button>
+        {/* Webcam (opt-in via ?webcam): find the faces most like you. */}
+        {webcamEnabled && (
+          <button
+            className={`dock-btn ${webcam ? "on" : ""}`}
+            onClick={toggleWebcam}
+            aria-label="webcam search"
+            title="Find faces like yours"
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {revealed && (

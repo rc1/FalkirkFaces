@@ -113,10 +113,14 @@ async function discover(): Promise<Keep[]> {
       if (page % 10 === 0)
         console.log(`  ${set}: ${page} pages, scanned ${scanned}, kept ${keep.length}`);
       if (MAX_PAGES && page >= MAX_PAGES) break;
+      // Stop early once we have more than enough to fill the download cap.
+      if (MAX_IMAGES && keep.length >= MAX_IMAGES * 1.15) break;
+      // The token is already URL-encoded (contains %3A) — pass it through as-is.
       const tok = first(xml, /<resumptionToken[^>]*>([^<]+)<\/resumptionToken>/);
-      url = tok ? `${OAI}?verb=ListRecords&resumptionToken=${encodeURIComponent(tok)}` : null;
+      url = tok ? `${OAI}?verb=ListRecords&resumptionToken=${tok}` : null;
     }
     console.log(`Finished ${set}: kept ${keep.length} so far`);
+    if (MAX_IMAGES && keep.length >= MAX_IMAGES * 1.15) break;
   }
   fs.writeFileSync(keepPath, JSON.stringify(keep, null, 2));
   fs.writeFileSync(path.join(paths.data, "ycba-manual-review.txt"), review.join("\n"));
