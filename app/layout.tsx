@@ -36,7 +36,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={config.app.monochrome ? "mono" : undefined}>
+      <body
+        className={config.app.monochrome ? "mono" : undefined}
+        style={
+          config.app.gridGap
+            ? ({ "--grid-gap": `${config.app.gridGap}px` } as React.CSSProperties)
+            : undefined
+        }
+      >
         {children}
         <SWRegister />
       </body>

@@ -33,7 +33,7 @@ body {
   width: 100vw;
   height: 100vh;
   display: grid;
-  gap: 0;
+  gap: var(--grid-gap, 0);
   overflow: hidden;
 }
 

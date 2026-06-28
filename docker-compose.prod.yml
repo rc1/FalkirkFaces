@@ -17,6 +17,7 @@ services:
         APP_NAME: ${APP_NAME:-Falkirk Faces}
         APP_TAGLINE: ${APP_TAGLINE:-Search a crowd by expression.}
         APP_MONOCHROME: ${APP_MONOCHROME:-}
+        APP_GRID_GAP: ${APP_GRID_GAP:-}
     image: ${PROJECT_NAME:-falkirkface}:local
     container_name: ${PROJECT_NAME:-falkirkface}
     restart: always
