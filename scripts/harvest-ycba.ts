@@ -25,11 +25,23 @@ const PEOPLE =
   /\b(self[- ]?portrait|portrait|sitter|man|woman|men|women|child|children|boy|girl|lady|gentleman|family|figure|figures|soldier|officer|king|queen|duke|earl|countess|lord|sir|mrs|miss|nobleman|servant|peasant|head of)\b/i;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// fetch with a hard timeout — a hung connection must never stall the harvest.
+async function fetchT(url: string, ms = 30000): Promise<Response> {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, { headers: { "User-Agent": UA }, signal: ctrl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 async function getText(url: string, tries = 3): Promise<string | null> {
   for (let i = 0; i < tries; i++) {
     try {
       await sleep(DELAY);
-      const res = await fetch(url, { headers: { "User-Agent": UA } });
+      const res = await fetchT(url);
       if (res.ok) return await res.text();
     } catch {
       /* retry */
@@ -160,9 +172,8 @@ async function main() {
     if (!imgId) continue;
     try {
       await sleep(DELAY);
-      const res = await fetch(
+      const res = await fetchT(
         `https://images.collections.yale.edu/iiif/2/${imgId}/full/${IMG_SIZE}/0/default.jpg`,
-        { headers: { "User-Agent": UA } },
       );
       if (!res.ok) continue;
       const buf = Buffer.from(await res.arrayBuffer());
