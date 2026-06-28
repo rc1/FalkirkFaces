@@ -17,8 +17,8 @@ export const config = {
     monochrome: /^(1|true|yes)$/i.test(process.env.APP_MONOCHROME || ""),
     // Which play-cycle playlist to use (see lib/playlist.ts). Runtime env.
     corpus: (process.env.APP_CORPUS || "falkirk").toLowerCase(),
-    // Gap between mosaic tiles in px (0 = flush). Build-time flag.
-    gridGap: num(process.env.APP_GRID_GAP, 0),
+    // Gap between mosaic tiles in px. Build-time flag; defaults to 2 for all.
+    gridGap: num(process.env.APP_GRID_GAP, 2),
   },
 
   // Filtering — faces below these are kept in the manifest but marked excluded.
