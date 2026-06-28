@@ -183,3 +183,15 @@ at the bottom. Maintained by Claude at Ross's request.
   are kept. Validated (cap-150 run). Launched full **7,000**-image background
   harvest (PD/CC0, ≤1949, people-subject). Pipeline + deploy of
   feelingbritain.electricglen.com to follow when it completes.
+
+## 2026-06-28 — Feeling Britain (YCBA) deployed
+
+- Harvest had stalled at ~5,775 (missing fetch-timeout — patched). Carried on with
+  those 5,775 open-access YCBA images.
+- Pipeline: detection → 12,832 faces → **3,665** kept (min 64px) → embedded.
+- Data-driven British-art playlist (maternal love · radiant joy · drunken
+  merriment · coquetry · mischief · …), validated mean overlap 0.022 — the most
+  distinct of the three corpora. Icon = an 18th-c painted portrait.
+- Deployed **https://feelingbritain.electricglen.com** — public (open-access), in
+  COLOUR (paintings), stack `/home/ross/datadrive/docker-feelingbritain/`.
+  "maternal love" → a mother-and-son portrait. Three corpora now live.
