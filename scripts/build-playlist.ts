@@ -40,6 +40,21 @@ const POOL_SCOTLAND = [
   "a faraway gaze", "deep absorption", "mischief", "slyness", "patience",
 ];
 
+// British art — portraits, genre scenes, history paintings — a wide range.
+const POOL_BRITAIN = [
+  "radiant joy", "delight", "tenderness", "serenity", "contentment", "melancholy",
+  "grief", "sorrow", "longing", "wistfulness", "pensiveness", "contemplation",
+  "reverie", "pride", "dignity", "nobility", "confidence", "defiance",
+  "determination", "sternness", "austerity", "contempt", "disdain", "arrogance",
+  "anger", "fury", "indignation", "fear", "terror", "alarm", "distress",
+  "anguish", "despair", "shame", "innocence", "devotion", "piety", "mischief",
+  "amusement", "curiosity", "fascination", "wonder", "awe", "ecstasy", "rapture",
+  "weariness", "resignation", "detachment", "vacancy", "a faraway gaze",
+  "a haunted look", "sensuality", "coquetry", "gentleness", "kindness",
+  "maternal love", "suspicion", "vigilance", "drunken merriment", "boredom",
+  "melodrama",
+];
+
 const norm = (v: number[]) => {
   let s = 0;
   for (const x of v) s += x * x;
@@ -63,7 +78,12 @@ const jaccard = (a: Set<string>, b: Set<string>) => {
 };
 
 async function main() {
-  const POOL = CORPUS === "scotland" ? POOL_SCOTLAND : POOL_FALKIRK;
+  const POOL =
+    CORPUS === "scotland"
+      ? POOL_SCOTLAND
+      : CORPUS === "britain"
+        ? POOL_BRITAIN
+        : POOL_FALKIRK;
   const db = await lancedb.connect(paths.lancedb);
   const tbl = await db.openTable("faces");
   const rows = (await tbl.query().limit(100000).toArray()) as Array<{

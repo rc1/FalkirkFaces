@@ -54,9 +54,33 @@ const SCOTLAND: string[] = [
   "gentleness",
 ];
 
+// Feeling Britain (Yale Center for British Art): portraits + genre/history
+// scenes — a far wider emotional range. Greedy max-distinct from a rich pool.
+const BRITAIN: string[] = [
+  "maternal love",
+  "radiant joy",
+  "drunken merriment",
+  "coquetry",
+  "mischief",
+  "wistfulness",
+  "a haunted look",
+  "weariness",
+  "piety",
+  "devotion",
+  "innocence",
+  "tenderness",
+  "nobility",
+  "disdain",
+  "indignation",
+  "sensuality",
+  "rapture",
+  "melodrama",
+];
+
 export const PLAYLISTS: Record<string, string[]> = {
   falkirk: FALKIRK,
   scotland: SCOTLAND,
+  britain: BRITAIN,
 };
 
 export function getPlaylist(): string[] {
