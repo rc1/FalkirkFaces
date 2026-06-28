@@ -195,3 +195,9 @@ at the bottom. Maintained by Claude at Ross's request.
 - Deployed **https://feelingbritain.electricglen.com** — public (open-access), in
   COLOUR (paintings), stack `/home/ross/datadrive/docker-feelingbritain/`.
   "maternal love" → a mother-and-son portrait. Three corpora now live.
+
+## 2026-06-28 — Note from Ross
+
+> I'm interested in using **emotion as the hook for navigating a collection** —
+> letting people find their way into an archive through feeling rather than
+> dates, names, or keywords.
