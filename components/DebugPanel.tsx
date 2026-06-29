@@ -22,7 +22,7 @@ export const DEFAULT_DBG: Dbg = {
   zoomMs: 700,
   fadeDelay: 520,
   dismissSpan: 360,
-  bloomStep: 7,
+  bloomStep: 600,
   playHold: 4000,
 };
 
@@ -99,7 +99,7 @@ export default function DebugPanel({
       <Row label="zoom ms" value={dbg.zoomMs} min={200} max={1500} step={20} onChange={set("zoomMs")} />
       <Row label="hold @ cell" value={dbg.fadeDelay} min={0} max={1400} step={20} onChange={set("fadeDelay")} />
       <Row label="dismiss wave" value={dbg.dismissSpan} min={0} max={900} step={20} onChange={set("dismissSpan")} />
-      <Row label="bloom step" value={dbg.bloomStep} min={0} max={30} step={1} onChange={set("bloomStep")} />
+      <Row label="bloom span" value={dbg.bloomStep} min={0} max={2000} step={50} onChange={set("bloomStep")} />
       <Row label="play hold" value={dbg.playHold} min={1000} max={8000} step={250} onChange={set("playHold")} />
 
       <div className="debug-actions">

@@ -15,16 +15,35 @@ export type ExcludeReason =
   | "embedding_failed"
   | null;
 
-// Provenance / rights for a source image (heritage corpora like NLS). Optional —
-// the Falkirk corpus has none. Carried through so faces are never shown stripped
-// of attribution.
+// Provenance / rights / context for a source work (heritage corpora). Optional —
+// the Falkirk corpus has none. A flexible shape that any disparate collection can
+// map into: a normalized core for consistent display, a free-form `extra` map so
+// nothing collection-specific is lost, `references` for links to longer prose,
+// and `blurb` for an evocative line grounded ONLY in the facts above it. Carried
+// through so faces are never shown stripped of provenance.
+export interface SourceRef {
+  label: string;
+  url: string;
+}
 export interface Source {
   institution: string | null; // e.g. "National Library of Scotland"
-  label: string | null; // human title of the source object
+  label: string | null; // title of the source work
   rights: string | null; // e.g. "CC BY 4.0", "Public Domain"
   rightsUrl: string | null;
   attribution: string | null; // full attribution string to display
-  sourceUrl: string | null; // link back to the catalogue record
+  sourceUrl: string | null; // link to the (human) catalogue page where possible
+  // --- enriched (all optional; filled by scripts/enrich-context.ts) ---
+  creator?: string | null; // artist / photographer
+  date?: string | null; // display date, e.g. "ca. 1820"
+  medium?: string | null; // "oil on canvas", "calotype"
+  classification?: string | null; // "painting", "photograph"
+  creditLine?: string | null; // "Paul Mellon Collection"
+  description?: string | null; // the institution's own caption / note
+  subjects?: string[]; // subject terms
+  depicts?: string[]; // named sitters / people
+  references?: SourceRef[]; // bibliography / related essays
+  extra?: Record<string, string>; // collection-specific fields, lossless
+  blurb?: string | null; // evocative line grounded only in the facts
 }
 
 export interface Face {

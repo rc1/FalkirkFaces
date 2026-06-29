@@ -11,6 +11,17 @@ import DebugPanel, { DEFAULT_DBG, type Dbg } from "@/components/DebugPanel";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const AUTOPLAY_DELAY = 7000; // show the hint, then start the play-cycle
 
+// Enough results to fill the mosaic on this viewport (mirrors FaceGrid's tile
+// sizing) — a small screen needs ~80, a widescreen ~500.
+function gridLimit(): number {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const t = w < 600 ? 72 : w < 960 ? 104 : 132;
+  const cols = Math.max(1, Math.round(w / t));
+  const rows = Math.ceil(h / t);
+  return Math.min(600, cols * rows + 12);
+}
+
 export default function Home() {
   const [faces, setFaces] = useState<FaceView[]>([]);
   const [radial, setRadial] = useState(false);
@@ -45,7 +56,7 @@ export default function Home() {
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q, limit: 200 }),
+        body: JSON.stringify({ query: q, limit: gridLimit() }),
       });
       const data = await res.json();
       setFaces(data.error ? [] : data.faces);
@@ -145,7 +156,7 @@ export default function Home() {
     const res = await fetch("/api/search-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: dataUrl, limit: 200 }),
+      body: JSON.stringify({ image: dataUrl, limit: gridLimit() }),
     });
     const data = await res.json();
     if (!data.error) {

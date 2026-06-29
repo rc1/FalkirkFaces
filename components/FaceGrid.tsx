@@ -20,7 +20,7 @@ export default function FaceGrid({
   gen,
   tileOverride = 0,
   dismissSpan = 360,
-  bloomStep = 7,
+  bloomStep = 600,
   faceZoom = 1,
 }: {
   faces: FaceView[];
@@ -30,7 +30,7 @@ export default function FaceGrid({
   gen: number;
   tileOverride?: number; // 0 = responsive
   dismissSpan?: number; // ms spread of the fade-out wave
-  bloomStep?: number; // ms delay per tile in the radial bloom
+  bloomStep?: number; // total ms span of the radial bloom (not per-tile)
   faceZoom?: number; // CSS scale of the face within its tile
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -123,7 +123,12 @@ export default function FaceGrid({
           <button
             key={`${gen}-${i}`}
             className={dismissIndex == null ? "cell bloom" : "cell"}
-            style={{ animationDelay: `${p.rank * bloomStep}ms`, ...dismissStyle }}
+            style={{
+              // Bloom delay is a fraction of a fixed span, not per-tile — so the
+              // whole grid blooms in ~the same time on a laptop and a widescreen.
+              animationDelay: `${(p.rank / Math.max(layout!.total, 1)) * bloomStep}ms`,
+              ...dismissStyle,
+            }}
             onClick={(e) =>
               onReveal(face, i, e.currentTarget.getBoundingClientRect())
             }
