@@ -46,7 +46,9 @@ export default function Home() {
   // the grid fades back in while the image is still fading/shrinking away.
   const [dismiss, setDismiss] = useState<number | null>(null);
 
+  const lastQuery = useRef("");
   const load = useCallback(async (q: string) => {
+    lastQuery.current = q;
     if (!q.trim()) {
       const res = await fetch("/api/faces");
       const data = await res.json();
@@ -56,7 +58,11 @@ export default function Home() {
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: q, limit: gridLimit() }),
+        body: JSON.stringify({
+          query: q,
+          limit: gridLimit(),
+          mode: dbgRef.current.queryMode,
+        }),
       });
       const data = await res.json();
       setFaces(data.error ? [] : data.faces);
@@ -64,6 +70,12 @@ export default function Home() {
     }
     setGen((g) => g + 1);
   }, []);
+
+  // Switching the debug search-ranking mode re-runs the last query for compare.
+  useEffect(() => {
+    if (lastQuery.current.trim()) load(lastQuery.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbg.queryMode]);
 
   useEffect(() => {
     load("");

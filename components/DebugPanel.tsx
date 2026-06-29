@@ -4,6 +4,8 @@
 // zoom within tiles, animation timings, play pacing). Open it with the backtick
 // key, ?debug in the URL, or 4 quick taps in the top-left corner.
 
+export type QueryMode = "match" | "a" | "b";
+
 export interface Dbg {
   tile: number; // 0 = responsive
   faceZoom: number; // CSS scale of the face inside its tile
@@ -13,6 +15,7 @@ export interface Dbg {
   dismissSpan: number;
   bloomStep: number;
   playHold: number;
+  queryMode: QueryMode; // how a search is ranked (see /api/search)
 }
 
 export const DEFAULT_DBG: Dbg = {
@@ -24,7 +27,14 @@ export const DEFAULT_DBG: Dbg = {
   dismissSpan: 360,
   bloomStep: 600,
   playHold: 4000,
+  queryMode: "match",
 };
+
+const MODES: { id: QueryMode; label: string; hint: string }[] = [
+  { id: "match", label: "match", hint: "nearest to the query (cluster)" },
+  { id: "a", label: "axis A", hint: "matches, re-ordered query→opposite" },
+  { id: "b", label: "axis B", hint: "spectrum across query→opposite" },
+];
 
 function Row({
   label,
@@ -78,6 +88,22 @@ export default function DebugPanel({
         <button onClick={onClose} aria-label="close debug">
           ✕
         </button>
+      </div>
+
+      <div className="debug-modes">
+        <div className="debug-modes-label">search ranking</div>
+        <div className="debug-seg">
+          {MODES.map((m) => (
+            <button
+              key={m.id}
+              className={dbg.queryMode === m.id ? "on" : ""}
+              title={m.hint}
+              onClick={() => setDbg((d) => ({ ...d, queryMode: m.id }))}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <label className="debug-row debug-check">

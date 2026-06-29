@@ -56,3 +56,45 @@ export async function searchVectors(
     distance: Number(r._distance),
   }));
 }
+
+export interface VectorHit extends SearchHit {
+  vector: number[];
+}
+
+const toNums = (v: unknown): number[] => Array.from(v as ArrayLike<number>);
+
+/** Like searchVectors, but also returns each hit's embedding (for re-ranking). */
+export async function searchVectorsFull(
+  vector: number[],
+  limit: number,
+): Promise<VectorHit[]> {
+  const db = await connect();
+  let tbl;
+  try {
+    tbl = await db.openTable(TABLE);
+  } catch {
+    return [];
+  }
+  const rows = await tbl.search(vector).limit(limit).toArray();
+  return rows.map((r: Record<string, unknown>) => ({
+    id: String(r.id),
+    distance: Number(r._distance),
+    vector: toNums(r.vector),
+  }));
+}
+
+/** Every indexed vector (the corpus is small — a full scan is cheap). */
+export async function allVectors(): Promise<VectorRow[]> {
+  const db = await connect();
+  let tbl;
+  try {
+    tbl = await db.openTable(TABLE);
+  } catch {
+    return [];
+  }
+  const rows = await tbl.query().limit(100000).toArray();
+  return rows.map((r: Record<string, unknown>) => ({
+    id: String(r.id),
+    vector: toNums(r.vector),
+  }));
+}

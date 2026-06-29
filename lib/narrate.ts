@@ -60,6 +60,44 @@ function factsOf(s: Source): string {
     .join("\n");
 }
 
+// The diametric opposite pole of an emotion, chosen by Gemini — the far end of
+// the same emotional axis (happy -> sad, tender -> menacing). Cached on disk.
+const POLES = path.join(paths.data, "poles-cache.json");
+let poles: Record<string, string> | null = null;
+export async function oppositeOf(query: string): Promise<string> {
+  const key = query.toLowerCase().trim();
+  if (!poles) {
+    try {
+      poles = JSON.parse(fs.readFileSync(POLES, "utf8"));
+    } catch {
+      poles = {};
+    }
+  }
+  const p = poles!;
+  if (key in p) return p[key];
+  const prompt =
+    `Name the single emotion or feeling that is the diametric opposite of "${query}" ` +
+    `— the far end of the same emotional axis (e.g. happy -> sad, tender -> menacing, ` +
+    `calm -> agitated). Reply with ONLY that word or short phrase, lowercase, no ` +
+    `punctuation, no explanation.`;
+  try {
+    const r = await ai().models.generateContent({ model: MODEL, contents: prompt });
+    const text = (r.text || "").trim().toLowerCase().replace(/[".]+$/g, "");
+    if (text) {
+      p[key] = text;
+      try {
+        fs.writeFileSync(POLES, JSON.stringify(p));
+      } catch {
+        /* best effort */
+      }
+      return text;
+    }
+  } catch {
+    /* fall through */
+  }
+  return "";
+}
+
 /** Grounded caption for a source work, keyed by a stable id. Cached. */
 export async function blurbFor(key: string, s: Source): Promise<string | null> {
   const c = load();
