@@ -28,6 +28,7 @@ export default function Home() {
   const [gen, setGen] = useState(0);
   const [query, setQuery] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [webcam, setWebcam] = useState(false);
   const [webcamEnabled, setWebcamEnabled] = useState(false); // ?webcam gate
   const [fs, setFs] = useState(false);
@@ -47,28 +48,54 @@ export default function Home() {
   const [dismiss, setDismiss] = useState<number | null>(null);
 
   const lastQuery = useRef("");
+  const abortRef = useRef<AbortController | null>(null);
   const load = useCallback(async (q: string) => {
     lastQuery.current = q;
-    if (!q.trim()) {
-      const res = await fetch("/api/faces");
-      const data = await res.json();
-      setFaces(data.faces);
-      setRadial(false);
-    } else {
-      const res = await fetch("/api/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query: q,
-          limit: gridLimit(),
-          mode: dbgRef.current.queryMode,
-        }),
-      });
-      const data = await res.json();
-      setFaces(data.error ? [] : data.faces);
-      setRadial(true);
+    abortRef.current?.abort(); // supersede any in-flight search
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
+    // Only surface the spinner if the search is actually slow (axis modes), so
+    // fast match-mode searches and the play-cycle don't flicker it.
+    const timer = setTimeout(() => {
+      if (abortRef.current === ctrl) setLoading(true);
+    }, 250);
+    try {
+      if (!q.trim()) {
+        const res = await fetch("/api/faces", { signal: ctrl.signal });
+        const data = await res.json();
+        setFaces(data.faces);
+        setRadial(false);
+      } else {
+        const res = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: q,
+            limit: gridLimit(),
+            mode: dbgRef.current.queryMode,
+          }),
+          signal: ctrl.signal,
+        });
+        const data = await res.json();
+        setFaces(data.error ? [] : data.faces);
+        setRadial(true);
+      }
+      setGen((g) => g + 1);
+    } catch {
+      return; // aborted or failed — keep whatever is on screen
+    } finally {
+      clearTimeout(timer);
+      if (abortRef.current === ctrl) {
+        setLoading(false);
+        abortRef.current = null;
+      }
     }
-    setGen((g) => g + 1);
+  }, []);
+
+  const cancelSearch = useCallback(() => {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    setLoading(false);
   }, []);
 
   // Switching the debug search-ranking mode re-runs the last query for compare.
@@ -204,6 +231,17 @@ export default function Home() {
         faceZoom={dbg.faceZoom}
       />
 
+      {/* search-in-flight indicator with a cancel (axis sorts can be slow) */}
+      {loading && (
+        <div className="search-loading">
+          <span className="spinner" />
+          <span>sorting…</span>
+          <button onClick={cancelSearch} aria-label="cancel search" title="Cancel">
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* subtle center vignette — edges fade to draw the eye inward */}
       <div className="vignette" style={{ opacity: dbg.vignette }} />
 
@@ -297,7 +335,13 @@ export default function Home() {
       )}
 
       {dbgOpen && (
-        <DebugPanel dbg={dbg} setDbg={setDbg} onClose={() => setDbgOpen(false)} />
+        <DebugPanel
+          dbg={dbg}
+          setDbg={setDbg}
+          onClose={() => setDbgOpen(false)}
+          loading={loading}
+          onCancel={cancelSearch}
+        />
       )}
     </main>
   );

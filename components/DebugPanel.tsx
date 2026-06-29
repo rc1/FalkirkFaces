@@ -73,10 +73,14 @@ export default function DebugPanel({
   dbg,
   setDbg,
   onClose,
+  loading = false,
+  onCancel,
 }: {
   dbg: Dbg;
   setDbg: (updater: (d: Dbg) => Dbg) => void;
   onClose: () => void;
+  loading?: boolean;
+  onCancel?: () => void;
 }) {
   const set = (k: keyof Dbg) => (v: number) =>
     setDbg((d) => ({ ...d, [k]: v }));
@@ -91,7 +95,10 @@ export default function DebugPanel({
       </div>
 
       <div className="debug-modes">
-        <div className="debug-modes-label">search ranking</div>
+        <div className="debug-modes-label">
+          search ranking
+          {loading && <span className="spinner spinner-sm" />}
+        </div>
         <div className="debug-seg">
           {MODES.map((m) => (
             <button
@@ -104,6 +111,11 @@ export default function DebugPanel({
             </button>
           ))}
         </div>
+        {loading && (
+          <button className="debug-cancel" onClick={onCancel}>
+            cancel sort
+          </button>
+        )}
       </div>
 
       <label className="debug-row debug-check">
