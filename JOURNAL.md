@@ -224,3 +224,16 @@ at the bottom. Maintained by Claude at Ross's request.
     defining the opposite is non-trivial.
   - Recommended generalisation: **"from X to Y"** — user names BOTH poles
     (tender→menacing, joy→grief); single-emotion search is the special case.
+
+## 2026-06-29 — Loading/cancel + enrichment shipped
+
+- **Loading + cancel for searches.** Axis sorts (esp. B = full vector scan +
+  first-time Gemini pole lookup) had no feedback — "didn't realize it was doing
+  it." Now: each search aborts the previous in-flight request; a delayed (250ms)
+  "sorting…" pill with a cancel ✕ appears only for genuinely slow searches (fast
+  match-mode + play-cycle never flicker it); the debug panel mirrors it (spinner +
+  "cancel sort"). Cancel aborts the fetch and keeps the current results on screen.
+- **Context enrichment complete + deployed.** Britain 2,885 works (all with
+  maker), Scotland 1,313 (862 with maker). Enriched sources.json shipped to both
+  servers; on-demand blurbs verified live (e.g. a John S. Clifton 1849 scene).
+  Falkirk unaffected (no sources). All three healthy.
