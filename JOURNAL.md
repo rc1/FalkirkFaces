@@ -201,3 +201,26 @@ at the bottom. Maintained by Claude at Ross's request.
 > I'm interested in using **emotion as the hook for navigating a collection** —
 > letting people find their way into an archive through feeling rather than
 > dates, names, or keywords.
+
+## 2026-06-29 — Bug + idea: diametric emotion ordering
+
+- **Bug (search doesn't fill on big screens):** `gridLimit()` caps at 600; a
+  massive widescreen has >600 cells, so the outer ring stays empty. Fix = raise/
+  remove the cap. (Not yet applied.)
+- **Idea from Ross — order search results along an emotional AXIS** (e.g. search
+  "happy", lay out from happy → sad) instead of a similarity cluster. Discussion:
+  - Turns search from "find X" into "traverse the axis between X and its
+    opposite" — a spectrum/journey. Squarely "emotion as navigation."
+  - Key insight: projecting a face onto the difference vector `(opposite − query)`
+    **cancels common-mode content** (medium/era/setting) that pollutes raw
+    similarity — so the axis is emotion-isolating, not just decorative.
+  - Two flavours: (a) order the query-matches by axis position = subtle gradient
+    within the cluster; (b) select faces near the LINE and lay out the full span =
+    a genuine happy→neutral→sad journey (the compelling one).
+  - Wants a linear / centre-diverging layout (a new "axis" MODE), not the radial
+    magnitude bloom.
+  - Caveats: off-axis emotions (anger/fear) flatten onto the line and mis-place;
+    lopsided collections (Scotland = mostly solemn) leave one pole sparse;
+    defining the opposite is non-trivial.
+  - Recommended generalisation: **"from X to Y"** — user names BOTH poles
+    (tender→menacing, joy→grief); single-emotion search is the special case.
