@@ -29,6 +29,20 @@ export default function Reveal({
   const [vis, setVis] = useState(false); // opacity
   const [expanded, setExpanded] = useState(false); // grown to full
   const [closing, setClosing] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false); // context panel
+  const [blurb, setBlurb] = useState<string | null>(null);
+  const [blurbLoading, setBlurbLoading] = useState(false);
+
+  // Generate the grounded blurb only when the viewer asks for context.
+  useEffect(() => {
+    if (!infoOpen || blurb !== null || blurbLoading || !face.source) return;
+    setBlurbLoading(true);
+    fetch(`/api/blurb?id=${encodeURIComponent(face.id)}`)
+      .then((r) => r.json())
+      .then((d) => setBlurb(d.blurb || ""))
+      .catch(() => setBlurb(""))
+      .finally(() => setBlurbLoading(false));
+  }, [infoOpen, blurb, blurbLoading, face.id, face.source]);
 
   const geo = useMemo(() => {
     const vw = window.innerWidth;
@@ -112,22 +126,54 @@ export default function Reveal({
         />
       </div>
 
-      {/* Provenance — heritage faces are never shown stripped of attribution. */}
+      {/* Provenance + grounded context — subtle by default, expandable. */}
       {big && face.source && (
         <div className="reveal-credit" onClick={(e) => e.stopPropagation()}>
-          {face.source.label && <span>{face.source.label}</span>}
-          {face.source.rights && <span> · {face.source.rights}</span>}
-          {face.source.institution &&
-            (face.source.sourceUrl ? (
-              <>
-                {" · "}
-                <a href={face.source.sourceUrl} target="_blank" rel="noreferrer">
-                  {face.source.institution} ↗
-                </a>
-              </>
-            ) : (
-              <span> · {face.source.institution}</span>
-            ))}
+          {!infoOpen ? (
+            <button className="credit-collapsed" onClick={() => setInfoOpen(true)}>
+              <span className="credit-titleline">
+                {face.source.label || face.source.institution}
+              </span>
+              <span className="credit-i">ⓘ</span>
+            </button>
+          ) : (
+            <div className="credit-panel">
+              <button
+                className="credit-close"
+                onClick={() => setInfoOpen(false)}
+                aria-label="close context"
+              >
+                ✕
+              </button>
+              {face.source.label && (
+                <div className="credit-title">{face.source.label}</div>
+              )}
+              {(face.source.creator || face.source.date || face.source.medium) && (
+                <div className="credit-meta">
+                  {[face.source.creator, face.source.date, face.source.medium]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </div>
+              )}
+              {(blurbLoading || blurb) && (
+                <div className="credit-blurb">{blurb || "…"}</div>
+              )}
+              {face.source.description && (
+                <div className="credit-desc">{face.source.description}</div>
+              )}
+              {face.source.creditLine && (
+                <div className="credit-sub">{face.source.creditLine}</div>
+              )}
+              <div className="credit-foot">
+                {face.source.rights && <span>{face.source.rights}</span>}
+                {face.source.sourceUrl && (
+                  <a href={face.source.sourceUrl} target="_blank" rel="noreferrer">
+                    View at {face.source.institution} ↗
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

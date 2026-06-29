@@ -1,6 +1,7 @@
 import fs from "node:fs";
+import path from "node:path";
 import { paths } from "./paths";
-import type { Face, FaceView } from "./types";
+import type { Face, FaceView, Source } from "./types";
 
 // The manifest is the human-readable record of every face we know about
 // (included and excluded). LanceDB only holds vectors; this holds meaning.
@@ -8,6 +9,23 @@ import type { Face, FaceView } from "./types";
 export function readManifest(): Face[] {
   if (!fs.existsSync(paths.manifest)) return [];
   return JSON.parse(fs.readFileSync(paths.manifest, "utf8"));
+}
+
+// Provenance/context is looked up LIVE from sources.json (keyed by source
+// filename), not from the manifest's crop-time snapshot — so re-enriching the
+// catalogue context takes effect without re-cropping. Cached per process.
+let _src: Record<string, Source> | null = null;
+export function sourceFor(filename: string): Source | null {
+  if (!_src) {
+    try {
+      _src = JSON.parse(
+        fs.readFileSync(path.join(paths.data, "sources.json"), "utf8"),
+      );
+    } catch {
+      _src = {};
+    }
+  }
+  return _src![filename] ?? null;
 }
 
 export function writeManifest(faces: Face[]): void {
@@ -50,7 +68,7 @@ export function toView(f: Face, score?: number): FaceView {
     cropHeight: f.cropHeight,
     caption: f.caption,
     expressionLabel: f.expressionLabel,
-    source: f.source ?? null,
+    source: sourceFor(f.sourceImageFilename) ?? f.source ?? null,
     ...(score !== undefined ? { score } : {}),
   };
 }
