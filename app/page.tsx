@@ -11,15 +11,18 @@ import DebugPanel, { DEFAULT_DBG, type Dbg } from "@/components/DebugPanel";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const AUTOPLAY_DELAY = 7000; // show the hint, then start the play-cycle
 
-// Enough results to fill the mosaic on this viewport (mirrors FaceGrid's tile
-// sizing) — a small screen needs ~80, a widescreen ~500.
+// Enough results to fill the mosaic on this viewport. Mirrors FaceGrid's exact
+// tile math (cols from the target, then rows from the resulting cell size) so we
+// never undercount — a small screen needs ~80, a 4K/widescreen 1000+. The ceiling
+// is just a sanity bound; the corpus or the search caps it in practice.
 function gridLimit(): number {
   const w = window.innerWidth;
   const h = window.innerHeight;
   const t = w < 600 ? 72 : w < 960 ? 104 : 132;
   const cols = Math.max(1, Math.round(w / t));
-  const rows = Math.ceil(h / t);
-  return Math.min(600, cols * rows + 12);
+  const cell = w / cols;
+  const rows = Math.max(1, Math.ceil(h / cell));
+  return Math.min(3000, cols * rows + 24);
 }
 
 export default function Home() {
